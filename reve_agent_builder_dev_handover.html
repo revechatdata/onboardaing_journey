@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REVE Agent Builder — Developer Handover</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#151B26; --paper:#E7EBF2; --card:#FFFFFF; --muted:#5E6879; --faint:#8A93A3;
+  --line:#D5DCE6; --line2:#E5EAF1;
+  --flow:#3D37C9;      /* ai agent / primary signal */
+  --amber:#B26A08;     /* trigger */
+  --violet:#7A3DB8;    /* condition / router */
+  --teal:#0B6E80;      /* tool / data */
+  --green:#0E7A54;     /* response / success */
+  --slate:#455467;     /* api action */
+  --flow-tint:#ECEBFB; --amber-tint:#FBF0DF; --violet-tint:#F3EAFA;
+  --teal-tint:#E2F1F3; --green-tint:#E1F2EB; --slate-tint:#EAEEF3;
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --disp:'Space Grotesk',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--paper);
+  background-image:linear-gradient(var(--line2) 1px,transparent 1px),linear-gradient(90deg,var(--line2) 1px,transparent 1px);
+  background-size:26px 26px;
+  color:var(--ink); font-family:var(--sans); font-size:15px; line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 26px;display:grid;grid-template-columns:214px 1fr;gap:38px;align-items:start}
+
+/* ── index rail ── */
+.rail{position:sticky;top:0;height:100vh;padding:30px 0;overflow-y:auto;display:flex;flex-direction:column}
+.brand{display:flex;align-items:center;gap:9px;margin-bottom:26px}
+.brand .glyph{width:30px;height:30px;border-radius:7px;background:var(--flow);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand .glyph svg{width:16px;height:16px}
+.brand b{font-family:var(--disp);font-weight:600;font-size:14.5px;letter-spacing:-.2px}
+.brand span{display:block;font-size:10.5px;color:var(--faint);font-family:var(--mono);letter-spacing:.5px;text-transform:uppercase}
+.idx{list-style:none;position:relative;padding-left:16px}
+.idx::before{content:"";position:absolute;left:3px;top:8px;bottom:8px;width:1.5px;background:var(--line)}
+.idx li{position:relative;margin:2px 0}
+.idx a{display:block;padding:5px 8px 5px 6px;font-size:12.5px;color:var(--muted);text-decoration:none;border-radius:6px;transition:.15s;line-height:1.35}
+.idx a .n{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-right:7px}
+.idx a:hover{color:var(--ink);background:#fff}
+.idx a.on{color:var(--flow);font-weight:600}
+.idx li.on::before{content:"";position:absolute;left:-13px;top:9px;width:7px;height:7px;border-radius:50%;background:var(--flow);box-shadow:0 0 0 3px var(--flow-tint)}
+
+/* ── main ── */
+main{padding:40px 0 90px;min-width:0}
+.hero{margin-bottom:46px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--flow);font-weight:500;margin-bottom:14px}
+h1{font-family:var(--disp);font-weight:700;font-size:40px;line-height:1.06;letter-spacing:-1.2px;margin-bottom:16px}
+h1 em{font-style:normal;color:var(--flow)}
+.lede{font-size:16.5px;color:var(--muted);max-width:70ch;line-height:1.6}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}
+.tagp{font-family:var(--mono);font-size:11px;padding:5px 10px;border-radius:20px;background:#fff;border:1px solid var(--line);color:var(--muted)}
+
+section{margin:52px 0;scroll-margin-top:24px}
+h2{font-family:var(--disp);font-weight:600;font-size:24px;letter-spacing:-.5px;margin-bottom:8px;display:flex;align-items:baseline;gap:12px}
+h2 .sn{font-family:var(--mono);font-size:13px;color:var(--flow);font-weight:500}
+.sdesc{color:var(--muted);max-width:74ch;margin-bottom:22px}
+h3{font-family:var(--disp);font-weight:600;font-size:16px;letter-spacing:-.2px;margin:26px 0 11px}
+p{margin-bottom:12px}
+p+p{margin-top:-2px}
+strong{font-weight:600;color:var(--ink)}
+code{font-family:var(--mono);font-size:.87em;background:#fff;border:1px solid var(--line);border-radius:4px;padding:1px 5px;color:var(--flow)}
+a.ln{color:var(--flow);text-decoration:none;border-bottom:1px solid var(--flow-tint)}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px 24px;margin:16px 0}
+.callout{border-left:3px solid var(--flow);background:var(--flow-tint);border-radius:0 10px 10px 0;padding:15px 18px;margin:18px 0;font-size:14px}
+.callout.warn{border-color:var(--amber);background:var(--amber-tint)}
+.callout b{font-family:var(--disp)}
+
+/* code block */
+pre{background:#12161F;border-radius:11px;padding:18px 20px;overflow:auto;margin:16px 0;border:1px solid #232a37}
+pre code{background:none;border:none;color:#C7D0DE;font-size:12.6px;line-height:1.65;padding:0}
+.tk{color:#8A93A3}     /* punctuation */
+.tp{color:#C99C6B}     /* property key */
+.ts{color:#8FBF8F}     /* string */
+.tn{color:#C98BB8}     /* number/bool */
+.tc{color:#5E6879;font-style:italic}
+pre .cmt{color:#5E6879;font-style:italic}
+
+/* pipeline steps */
+.flowline{position:relative;margin:22px 0;padding-left:34px}
+.flowline::before{content:"";position:absolute;left:11px;top:6px;bottom:6px;width:2px;background:linear-gradient(var(--flow),var(--teal))}
+.fstep{position:relative;margin-bottom:16px}
+.fstep .dot{position:absolute;left:-34px;top:1px;width:24px;height:24px;border-radius:50%;background:#fff;border:2px solid var(--flow);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:600;color:var(--flow)}
+.fstep h4{font-family:var(--disp);font-weight:600;font-size:14.5px;margin-bottom:3px}
+.fstep p{font-size:13.5px;color:var(--muted);margin:0}
+
+/* tables */
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13px;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+th{text-align:left;font-family:var(--mono);font-size:10.5px;letter-spacing:.5px;text-transform:uppercase;color:var(--faint);font-weight:500;padding:11px 14px;border-bottom:1px solid var(--line);background:#FAFBFD}
+td{padding:10px 14px;border-bottom:1px solid var(--line2);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td code{font-size:11.5px;padding:1px 4px}
+.mono-c{font-family:var(--mono);font-size:12px;color:var(--muted)}
+
+/* node legend chips */
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.nchip{display:inline-flex;align-items:center;gap:7px;font-size:12px;padding:5px 11px;border-radius:7px;border:1px solid var(--line);background:#fff;font-family:var(--mono)}
+.nchip .sw{width:10px;height:10px;border-radius:3px}
+
+/* schematic */
+.schematic{background:#fff;border:1px solid var(--line);border-radius:14px;padding:8px;margin:18px 0;overflow-x:auto}
+.schematic svg{display:block;min-width:720px}
+@media(prefers-reduced-motion:no-preference){
+  .wire{stroke-dasharray:5 5;animation:dash 1.1s linear infinite}
+  @keyframes dash{to{stroke-dashoffset:-20}}
+}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:920px){
+  .wrap{grid-template-columns:1fr;gap:0}
+  .rail{display:none}
+  h1{font-size:31px}
+  .grid2{grid-template-columns:1fr}
+}
+.footnote{font-size:12px;color:var(--faint);font-family:var(--mono);margin-top:6px}
+hr.soft{border:none;border-top:1px solid var(--line);margin:34px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ══ INDEX RAIL ══ -->
+<aside class="rail">
+  <div class="brand">
+    <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="m13 8-2 3h3l-2 3" stroke-linecap="round"/></svg></div>
+    <div><b>Agent Builder</b><span>Handover · v1</span></div>
+  </div>
+  <ul class="idx" id="idx">
+    <li><a href="#overview"><span class="n">00</span>Overview</a></li>
+    <li><a href="#journey"><span class="n">01</span>Onboarding → data</a></li>
+    <li><a href="#orchestration"><span class="n">02</span>Builder orchestration</a></li>
+    <li><a href="#schema"><span class="n">03</span>Node &amp; edge schema</a></li>
+    <li><a href="#prompt-pipe"><span class="n">04</span>Prompt-build pipeline</a></li>
+    <li><a href="#generator"><span class="n">05</span>Generator API contract</a></li>
+    <li><a href="#testloop"><span class="n">06</span>3-round test loop</a></li>
+    <li><a href="#final-prompt"><span class="n">07</span>Final prompt</a></li>
+    <li><a href="#output-schema"><span class="n">08</span>Output schema</a></li>
+    <li><a href="#mapping"><span class="n">09</span>Field mapping</a></li>
+    <li><a href="#emit"><span class="n">10</span>Emitted Agent JSON</a></li>
+  </ul>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<main>
+
+<div class="hero" id="overview">
+  <div class="eyebrow">Developer Handover</div>
+  <h1>Turn an onboarding wizard into a<br>working <em>Agent JSON</em> — no manual wiring.</h1>
+  <p class="lede">The onboarding journey collects a business's category, sub-category, and behaviour requirements, then assembles three deliverables automatically: the <strong>Agent JSON</strong> (the node-graph workflow), the <strong>system prompt</strong>, and the <strong>output schema</strong>. This document specifies the orchestration model, the prompt-generation pipeline, and the exact artifacts the generator emits — so the backend can be built fast and correctly.</p>
+  <div class="meta">
+    <span class="tagp">reference: EIT Agent V2</span>
+    <span class="tagp">source: onboarding wizard (8 steps)</span>
+    <span class="tagp">target: node-graph runtime</span>
+    <span class="tagp">llm: gpt-4o-mini · gpt-4.1-mini</span>
+  </div>
+</div>
+
+<div class="callout">
+  <b>The one-line contract.</b> Onboarding selections → <code>fetch cached prompt</code> → <code>merge free-text via Generator API</code> → <code>test &amp; revise (×3)</code> → <code>emit nodes[] + edges{} + prompt + responseFormat</code> → redirect to dashboard with the graph pre-loaded.
+</div>
+
+<!-- ══ 01 JOURNEY ══ -->
+<section id="journey">
+  <h2><span class="sn">01</span>What the onboarding captures</h2>
+  <p class="sdesc">Each wizard step writes into a single state object. The generator reads that state — nothing else — to build the agent. The table below is the complete input surface; the "Feeds" column is the JSON target each field drives (detailed in §09).</p>
+  <table>
+    <thead><tr><th style="width:16%">Step</th><th style="width:30%">Captured</th><th style="width:26%">State key</th><th>Feeds</th></tr></thead>
+    <tbody>
+      <tr><td>0–1 · Account</td><td>Name, work email, OTP</td><td><code>—</code></td><td><span class="mono-c">accountId, creator{}</span></td></tr>
+      <tr><td>2 · Agent mode</td><td>ai · hybrid · human</td><td><code>agentMode</code></td><td><span class="mono-c">handover node presence + routing</span></td></tr>
+      <tr><td>3 · Industry</td><td>ecom / bfsi / telecom / travel / saas / other</td><td><code>selInd</code></td><td><span class="mono-c">prompt key, tool set, sub-agent suggestions</span></td></tr>
+      <tr><td>3 · Categories</td><td>Multi-select store categories (ecom)</td><td><code>selSubs[]</code></td><td><span class="mono-c">prompt <code>{cat}</code>, KB description</span></td></tr>
+      <tr><td>4 · Identity</td><td>Agent name, greeting</td><td><code>agentName · greeting</code></td><td><span class="mono-c">name, designation, trigger.initialMsg</span></td></tr>
+      <tr><td>4 · Use cases</td><td>Chips per industry</td><td><code>selUCs[]</code></td><td><span class="mono-c">prompt "use cases" segment, tools</span></td></tr>
+      <tr><td>4 · Custom instructions</td><td>Free-text + quick-add pills</td><td><code>customPrompt</code></td><td><span class="mono-c">Generator API "additional_requirements"</span></td></tr>
+      <tr><td>5 · Handover</td><td>Triggers + schedule + team</td><td><code>handoverTriggers · handoverSchedule · teamMembers</code></td><td><span class="mono-c">conditional branches, routing</span></td></tr>
+      <tr><td>6 · Knowledge</td><td>Docs, web crawl, store/API sync</td><td><code>kbDocs · kbCrawl · storeOk · prodSync · kbApi</code></td><td><span class="mono-c">tool_knowledgebase, tool_google_sheet, node_api_action</span></td></tr>
+    </tbody>
+  </table>
+  <p class="footnote">Note: <code>ucKey()</code> maps <code>selInd</code> to a prompt key (e.g. <code>ecom → ecom_shopify</code>). <code>categoryPromptLabel()</code> joins <code>selSubs</code> into a human phrase for the <code>{cat}</code> token.</p>
+</section>
+
+<!-- ══ 02 ORCHESTRATION ══ -->
+<section id="orchestration">
+  <h2><span class="sn">02</span>The builder orchestration</h2>
+  <p class="sdesc">A deployed agent is a directed graph of <strong>nodes</strong> joined by <strong>edges</strong>. This is the EIT reference graph the generator produces for an e-commerce store with a product sheet, a knowledge base, and an image-search path. Colour = node category.</p>
+
+  <div class="legend">
+    <span class="nchip"><span class="sw" style="background:var(--amber)"></span>trigger</span>
+    <span class="nchip"><span class="sw" style="background:var(--violet)"></span>conditional</span>
+    <span class="nchip"><span class="sw" style="background:var(--flow)"></span>ai_agent</span>
+    <span class="nchip"><span class="sw" style="background:var(--slate)"></span>api_action</span>
+    <span class="nchip"><span class="sw" style="background:var(--teal)"></span>tool</span>
+    <span class="nchip"><span class="sw" style="background:var(--green)"></span>response</span>
+  </div>
+
+  <div class="schematic">
+    <svg viewBox="0 0 760 430" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Agent orchestration node graph">
+      <defs>
+        <marker id="ah" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#8A93A3"/></marker>
+        <style>
+          .lbl{font-family:'IBM Plex Mono',monospace;font-size:11px;fill:#151B26}
+          .sub{font-family:'IBM Plex Mono',monospace;font-size:8.5px;fill:#5E6879}
+          .idxb{font-family:'IBM Plex Mono',monospace;font-size:8.5px;fill:#7A3DB8}
+          .wire{stroke:#8A93A3;stroke-width:1.6;fill:none}
+        </style>
+      </defs>
+
+      <!-- wires (drawn first, behind nodes) -->
+      <path class="wire" d="M138,60 H190" marker-end="url(#ah)"/>
+      <!-- condition to ai_agent_1 (text, idx0) -->
+      <path class="wire" d="M300,52 C340,52 340,60 372,60" marker-end="url(#ah)"/>
+      <text class="idxb" x="332" y="45">idx 0 · text</text>
+      <!-- condition to api (image, idx1) -->
+      <path class="wire" d="M258,80 C258,150 300,150 328,150" marker-end="url(#ah)"/>
+      <text class="idxb" x="268" y="128">idx 1 · image</text>
+      <!-- api to ai_agent (image path) -->
+      <path class="wire" d="M436,150 H470" marker-end="url(#ah)"/>
+      <!-- ai_agent_1 to response -->
+      <path class="wire" d="M482,60 H548" marker-end="url(#ah)"/>
+      <!-- ai_agent to response_1 -->
+      <path class="wire" d="M580,150 H612 C630,150 630,205 566,205" marker-end="url(#ah)"/>
+      <!-- ai_agent_1 to tools (bind) -->
+      <path class="wire" style="stroke:#0B6E80;stroke-dasharray:3 3" d="M420,80 C420,120 300,120 250,270 C230,300 300,300 342,300"/>
+      <path class="wire" style="stroke:#0B6E80;stroke-dasharray:3 3" d="M430,80 C430,200 520,300 552,300"/>
+      <text class="sub" x="250" y="262" fill="#0B6E80">tools bound to both agents ↓</text>
+
+      <!-- nodes -->
+      <!-- trigger -->
+      <g><rect x="20" y="42" width="118" height="38" rx="8" fill="#FBF0DF" stroke="#B26A08"/><text class="lbl" x="30" y="60">on_chat_message</text><text class="sub" x="30" y="72">trigger_chat_message</text></g>
+      <!-- condition -->
+      <g><rect x="190" y="34" width="110" height="46" rx="8" fill="#F3EAFA" stroke="#7A3DB8"/><text class="lbl" x="200" y="54">condition</text><text class="sub" x="200" y="66">node_conditional</text><text class="sub" x="200" y="76">text | image</text></g>
+      <!-- ai_agent_1 -->
+      <g><rect x="372" y="40" width="110" height="42" rx="8" fill="#ECEBFB" stroke="#3D37C9"/><text class="lbl" x="382" y="59">ai_agent_1</text><text class="sub" x="382" y="71">node_ai_agent · text</text></g>
+      <!-- api -->
+      <g><rect x="328" y="130" width="108" height="42" rx="8" fill="#EAEEF3" stroke="#455467"/><text class="lbl" x="338" y="149">api</text><text class="sub" x="338" y="161">node_api_action · vision</text></g>
+      <!-- ai_agent (image) -->
+      <g><rect x="470" y="130" width="110" height="42" rx="8" fill="#ECEBFB" stroke="#3D37C9"/><text class="lbl" x="480" y="149">ai_agent</text><text class="sub" x="480" y="161">node_ai_agent · image</text></g>
+      <!-- response -->
+      <g><rect x="548" y="42" width="120" height="38" rx="8" fill="#E1F2EB" stroke="#0E7A54"/><text class="lbl" x="558" y="60">response_to_chat</text><text class="sub" x="558" y="72">node_response_to_chat</text></g>
+      <!-- response_1 -->
+      <g><rect x="446" y="186" width="120" height="38" rx="8" fill="#E1F2EB" stroke="#0E7A54"/><text class="lbl" x="456" y="204">response_to_chat_1</text><text class="sub" x="456" y="216">node_response_to_chat</text></g>
+      <!-- tools -->
+      <g><rect x="342" y="282" width="132" height="38" rx="8" fill="#E2F1F3" stroke="#0B6E80"/><text class="lbl" x="352" y="300">eit_knowledgebase</text><text class="sub" x="352" y="312">tool_knowledgebase</text></g>
+      <g><rect x="490" y="282" width="120" height="38" rx="8" fill="#E2F1F3" stroke="#0B6E80"/><text class="lbl" x="500" y="300">google_sheet</text><text class="sub" x="500" y="312">tool_google_sheet</text></g>
+    </svg>
+  </div>
+
+  <p>Two things make this graph readable at generation time. First, <strong>the conditional fans out by branch index</strong>: <code>index 0</code> is the first declared condition (text) and routes to the text agent; <code>index 1</code> (image) routes to the vision API node. Second, <strong>tools are bound, not chained</strong> — they sit in the edge's <code>tools[]</code> array of an <code>ai_agent</code> node and are called on demand, never as a sequential downstream step.</p>
+</section>
+
+<!-- ══ 03 SCHEMA ══ -->
+<section id="schema">
+  <h2><span class="sn">03</span>Node &amp; edge schema</h2>
+  <p class="sdesc">Every node shares one envelope; only <code>data{}</code> varies by <code>type</code>. Edges are a map keyed by <em>source</em> node id.</p>
+
+  <h3>Node envelope</h3>
+<pre><code><span class="tk">{</span>
+  <span class="tp">"id"</span><span class="tk">:</span> <span class="ts">"uuid-v4"</span><span class="tk">,</span>
+  <span class="tp">"name"</span><span class="tk">:</span> <span class="ts">"machine_name"</span><span class="tk">,</span>        <span class="cmt">// referenced in {{local.&lt;name&gt;.output}}</span>
+  <span class="tp">"displayName"</span><span class="tk">:</span> <span class="ts">"Human Name"</span><span class="tk">,</span>
+  <span class="tp">"type"</span><span class="tk">:</span> <span class="ts">"node_ai_agent"</span><span class="tk">,</span>       <span class="cmt">// see type table below</span>
+  <span class="tp">"category"</span><span class="tk">:</span> <span class="ts">"node"</span><span class="tk">,</span>            <span class="cmt">// trigger | node | tool</span>
+  <span class="tp">"executor"</span><span class="tk">:</span> <span class="ts">"node_ai_agent"</span><span class="tk">,</span>   <span class="cmt">// == type</span>
+  <span class="tp">"webhookId"</span><span class="tk">:</span> <span class="tn">null</span><span class="tk">,</span>            <span class="cmt">// set only on trigger nodes</span>
+  <span class="tp">"position"</span><span class="tk">:</span> <span class="tk">{</span> <span class="tp">"x"</span><span class="tk">:</span> <span class="tn">0</span><span class="tk">,</span> <span class="tp">"y"</span><span class="tk">:</span> <span class="tn">0</span> <span class="tk">},</span>  <span class="cmt">// canvas layout only</span>
+  <span class="tp">"data"</span><span class="tk">:</span> <span class="tk">{</span> <span class="cmt">/* type-specific */</span> <span class="tk">},</span>
+  <span class="tp">"persistOutputInContext"</span><span class="tk">:</span> <span class="tn">null</span>
+<span class="tk">}</span></code></pre>
+
+  <h3>Node types &amp; their <code>data{}</code></h3>
+  <table>
+    <thead><tr><th>type</th><th>category</th><th>Key <code>data</code> fields</th></tr></thead>
+    <tbody>
+      <tr><td><code>trigger_chat_message</code></td><td>trigger</td><td><span class="mono-c">widgetId, initialMsg, chatSource, responseMode, postType</span></td></tr>
+      <tr><td><code>node_conditional</code></td><td>node</td><td><span class="mono-c">conditions[] → outerBlocks → innerBlocks {key, logic, value, valueType}</span></td></tr>
+      <tr><td><code>node_ai_agent</code></td><td>node</td><td><span class="mono-c">systemPrompt, inputPrompt, maxInteractionCount, responseFormat, enableResponseFormat, llmModel{provider,model}</span></td></tr>
+      <tr><td><code>node_api_action</code></td><td>node</td><td><span class="mono-c">method, endpoint, headers[], jsonData, bodyType, curl</span></td></tr>
+      <tr><td><code>node_response_to_chat</code></td><td>node</td><td><span class="mono-c">responseType, response</span></td></tr>
+      <tr><td><code>tool_knowledgebase</code></td><td>tool</td><td><span class="mono-c">selectedKBs[], knowledgeBaseIds[], description</span></td></tr>
+      <tr><td><code>tool_google_sheet</code></td><td>tool</td><td><span class="mono-c">documentId, sheetName, operation, credential</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Edge map</h3>
+  <p>The <code>edges</code> object is keyed by the <strong>source</strong> node id. <code>nodes[]</code> are downstream execution targets; <code>tools[]</code> are tools bound to an agent. <code>index</code> on a target selects the matching conditional branch. Leaf nodes (responses, tools) still get an entry with empty arrays.</p>
+<pre><code><span class="tp">"edges"</span><span class="tk">:</span> <span class="tk">{</span>
+  <span class="tp">"&lt;on_chat_message.id&gt;"</span><span class="tk">:</span> <span class="tk">{</span> <span class="tp">"nodes"</span><span class="tk">:</span> <span class="tk">[{</span> <span class="tp">"id"</span><span class="tk">:</span><span class="ts">"&lt;condition.id&gt;"</span><span class="tk">,</span> <span class="tp">"type"</span><span class="tk">:</span><span class="ts">"node"</span><span class="tk">,</span> <span class="tp">"index"</span><span class="tk">:</span><span class="tn">0</span> <span class="tk">}],</span> <span class="tp">"tools"</span><span class="tk">:</span><span class="tk">[]</span> <span class="tk">},</span>
+
+  <span class="tp">"&lt;condition.id&gt;"</span><span class="tk">:</span> <span class="tk">{</span> <span class="tp">"nodes"</span><span class="tk">:</span> <span class="tk">[</span>
+      <span class="tk">{</span> <span class="tp">"id"</span><span class="tk">:</span><span class="ts">"&lt;ai_agent_1.id&gt;"</span><span class="tk">,</span> <span class="tp">"type"</span><span class="tk">:</span><span class="ts">"node"</span><span class="tk">,</span> <span class="tp">"index"</span><span class="tk">:</span><span class="tn">0</span> <span class="tk">},</span>  <span class="cmt">// text branch</span>
+      <span class="tk">{</span> <span class="tp">"id"</span><span class="tk">:</span><span class="ts">"&lt;api.id&gt;"</span><span class="tk">,</span>        <span class="tp">"type"</span><span class="tk">:</span><span class="ts">"node"</span><span class="tk">,</span> <span class="tp">"index"</span><span class="tk">:</span><span class="tn">1</span> <span class="tk">}   </span><span class="cmt">// image branch</span>
+    <span class="tk">],</span> <span class="tp">"tools"</span><span class="tk">:</span><span class="tk">[]</span> <span class="tk">},</span>
+
+  <span class="tp">"&lt;ai_agent_1.id&gt;"</span><span class="tk">:</span> <span class="tk">{</span> <span class="tp">"nodes"</span><span class="tk">:</span> <span class="tk">[{</span> <span class="tp">"id"</span><span class="tk">:</span><span class="ts">"&lt;response_to_chat.id&gt;"</span><span class="tk">,</span> <span class="tp">"type"</span><span class="tk">:</span><span class="ts">"node"</span><span class="tk">,</span> <span class="tp">"index"</span><span class="tk">:</span><span class="tn">0</span> <span class="tk">}],</span>
+    <span class="tp">"tools"</span><span class="tk">:</span> <span class="tk">[</span> <span class="tk">{</span><span class="tp">"id"</span><span class="tk">:</span><span class="ts">"&lt;kb.id&gt;"</span><span class="tk">,</span><span class="tp">"type"</span><span class="tk">:</span><span class="ts">"tool"</span><span class="tk">,</span><span class="tp">"index"</span><span class="tk">:</span><span class="tn">0</span><span class="tk">},</span> <span class="tk">{</span><span class="tp">"id"</span><span class="tk">:</span><span class="ts">"&lt;sheet.id&gt;"</span><span class="tk">,</span><span class="tp">"type"</span><span class="tk">:</span><span class="ts">"tool"</span><span class="tk">,</span><span class="tp">"index"</span><span class="tk">:</span><span class="tn">0</span><span class="tk">}</span> <span class="tk">]</span> <span class="tk">},</span>
+
+  <span class="tp">"&lt;api.id&gt;"</span><span class="tk">:</span> <span class="tk">{</span> <span class="tp">"nodes"</span><span class="tk">:</span><span class="tk">[{</span> <span class="tp">"id"</span><span class="tk">:</span><span class="ts">"&lt;ai_agent.id&gt;"</span><span class="tk">,</span> <span class="tp">"type"</span><span class="tk">:</span><span class="ts">"node"</span><span class="tk">,</span> <span class="tp">"index"</span><span class="tk">:</span><span class="tn">0</span> <span class="tk">}],</span> <span class="tp">"tools"</span><span class="tk">:</span><span class="tk">[]</span> <span class="tk">},</span>
+  <span class="tp">"&lt;ai_agent.id&gt;"</span><span class="tk">:</span> <span class="tk">{</span> <span class="tp">"nodes"</span><span class="tk">:</span><span class="tk">[{</span> <span class="tp">"id"</span><span class="tk">:</span><span class="ts">"&lt;response_to_chat_1.id&gt;"</span><span class="tk">,</span> <span class="tp">"type"</span><span class="tk">:</span><span class="ts">"node"</span><span class="tk">,</span> <span class="tp">"index"</span><span class="tk">:</span><span class="tn">0</span> <span class="tk">}],</span> <span class="tp">"tools"</span><span class="tk">:</span> <span class="tk">[</span><span class="cmt">/*kb, sheet*/</span><span class="tk">]</span> <span class="tk">},</span>
+
+  <span class="tp">"&lt;response_to_chat.id&gt;"</span><span class="tk">:</span>   <span class="tk">{</span> <span class="tp">"nodes"</span><span class="tk">:</span><span class="tk">[],</span> <span class="tp">"tools"</span><span class="tk">:</span><span class="tk">[]</span> <span class="tk">},</span>  <span class="cmt">// leaf</span>
+  <span class="tp">"&lt;kb.id&gt;"</span><span class="tk">:</span> <span class="tk">{</span> <span class="tp">"nodes"</span><span class="tk">:</span><span class="tk">[],</span> <span class="tp">"tools"</span><span class="tk">:</span><span class="tk">[]</span> <span class="tk">},</span> <span class="tp">"&lt;sheet.id&gt;"</span><span class="tk">:</span> <span class="tk">{</span> <span class="tp">"nodes"</span><span class="tk">:</span><span class="tk">[],</span> <span class="tp">"tools"</span><span class="tk">:</span><span class="tk">[]</span> <span class="tk">}</span>
+<span class="tk">}</span></code></pre>
+  <div class="callout warn"><b>Wiring rule.</b> An <code>inputPrompt</code> references an upstream node by machine <code>name</code>, not id — e.g. the text agent reads <code>{{local.on_chat_message.body.query.message.text}}</code>, while the image agent reads <code>{{local.api.body.output[0].content[0].text}}</code>. Keep <code>name</code> stable when you generate ids.</p></div>
+</section>
+
+<!-- ══ 04 PROMPT PIPELINE ══ -->
+<section id="prompt-pipe">
+  <h2><span class="sn">04</span>Prompt-build pipeline</h2>
+  <p class="sdesc">The prompt is never hand-authored at runtime. It is composed from a cached base plus the user's free-text, merged by a dedicated Generator API call whose system message defines exactly how the merge happens.</p>
+
+  <div class="flowline">
+    <div class="fstep"><div class="dot">1</div><h4>Resolve inputs</h4><p>Read <code>ucKey(selInd)</code> → prompt key; <code>categoryPromptLabel(selSubs)</code> → <code>{cat}</code>; collect <code>selUCs</code>, <code>customPrompt</code>, quick-add pills, and available tools (KB / sheet / API present?).</p></div>
+    <div class="fstep"><div class="dot">2</div><h4>Fetch cached prompt</h4><p>Look up <code>PROMPTS[key]</code> and substitute <code>{cat}</code>. This is the deterministic base — <strong>no LLM call yet</strong>. If the user added nothing, this (segmented) is the final prompt.</p></div>
+    <div class="fstep"><div class="dot">3</div><h4>Merge free-text via Generator API</h4><p>Only if <code>customPrompt</code> or quick-add pills exist: send <code>{ cached_prompt, metadata, additional_requirements }</code> to the GPT Prompt Generator. The <strong>system message</strong> (§05) tells the model how to slot each requirement into the correct segment without dropping safety rules.</p></div>
+    <div class="fstep"><div class="dot">4</div><h4>Enforce segmentation</h4><p>The returned prompt must carry the fixed section headers (§04 below). Reject/re-ask if a segment is missing. Segmentation is what keeps later revisions surgical.</p></div>
+    <div class="fstep"><div class="dot">5</div><h4>Test &amp; revise (×3)</h4><p>Feed test-panel transcript + "Correct this" notes back to the Generator as revision instructions. Max 3 rounds. On round 3 → <code>goDash()</code>, graph pre-loaded in the visual builder.</p></div>
+  </div>
+
+  <h3>Mandatory prompt segments</h3>
+  <p>Every generated <code>systemPrompt</code> is written in this fixed order. The Generator maps each additional requirement to exactly one segment; nothing goes in "misc".</p>
+  <table>
+    <thead><tr><th style="width:22%">Segment</th><th>Holds</th><th style="width:26%">Source</th></tr></thead>
+    <tbody>
+      <tr><td><code>ROLE &amp; GOAL</code></td><td>Persona, business, conversion objective</td><td>cached base + identity</td></tr>
+      <tr><td><code>DOMAIN</code></td><td>In-scope topics; refuse out-of-scope</td><td>cached base (industry)</td></tr>
+      <tr><td><code>TOOLS</code></td><td>Which tool for which query; never guess</td><td>KB / sheet / API presence</td></tr>
+      <tr><td><code>DATA / FIELDS</code></td><td>Columns, normalization, availability mapping</td><td>store/sheet connection</td></tr>
+      <tr><td><code>SELECTION LOGIC</code></td><td>Match tiers, budget parsing, fallbacks</td><td>use cases + cached base</td></tr>
+      <tr><td><code>RESPONSE RULES</code></td><td>Brevity, CTA, lead capture triggers</td><td>use cases + custom</td></tr>
+      <tr><td><code>OUTPUT FORMAT</code></td><td>The exact reply shape (mirrors output schema)</td><td>output schema §08</td></tr>
+      <tr><td><code>SAFETY</code></td><td>No fabrication, no competitors, escalation</td><td>cached base (locked)</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ══ 05 GENERATOR CONTRACT ══ -->
+<section id="generator">
+  <h2><span class="sn">05</span>Generator API contract</h2>
+  <p class="sdesc">One endpoint does both composition (step 3) and revision (step 5). The <strong>system message</strong> is fixed and shipped by us; the user's data rides in the user message. This is the "instruction given prior" that decides how requirements attach to the prompt.</p>
+
+  <h3>System message (fixed, shipped by backend)</h3>
+<pre><code><span class="tc">You are a Prompt Composer for a no-code support-agent builder.</span>
+<span class="tc">You receive a CACHED base prompt, agent METADATA, and a list of</span>
+<span class="tc">ADDITIONAL_REQUIREMENTS (free text + quick-add behaviours).</span>
+
+<span class="tc">RULES</span>
+<span class="tc">1. Output ONE system prompt using EXACTLY these segment headers,</span>
+<span class="tc">   in order: ROLE & GOAL, DOMAIN, TOOLS, DATA / FIELDS,</span>
+<span class="tc">   SELECTION LOGIC, RESPONSE RULES, OUTPUT FORMAT, SAFETY.</span>
+<span class="tc">2. Slot each ADDITIONAL_REQUIREMENT into the single most relevant</span>
+<span class="tc">   segment. Never invent a segment. Never place a rule in two.</span>
+<span class="tc">3. Preserve every line of the SAFETY segment from the base prompt</span>
+<span class="tc">   verbatim. You may ADD safety lines; you may not remove them.</span>
+<span class="tc">4. Do not reference tools that are not listed in METADATA.tools.</span>
+<span class="tc">5. Keep instructions imperative and testable. No marketing copy.</span>
+<span class="tc">6. Also return an OUTPUT_SCHEMA (JSON Schema) that matches the</span>
+<span class="tc">   OUTPUT FORMAT segment exactly.</span>
+<span class="tc">7. Reply as JSON: { "system_prompt": string, "output_schema": object,</span>
+<span class="tc">   "segments_touched": string[] }. No prose outside the JSON.</span></code></pre>
+
+  <div class="grid2">
+    <div>
+      <h3>Request — compose</h3>
+<pre><code><span class="tk">{</span>
+ <span class="tp">"cached_prompt"</span><span class="tk">:</span> <span class="ts">"&lt;PROMPTS[key], {cat} filled&gt;"</span><span class="tk">,</span>
+ <span class="tp">"metadata"</span><span class="tk">:</span> <span class="tk">{</span>
+   <span class="tp">"industry"</span><span class="tk">:</span> <span class="ts">"ecom"</span><span class="tk">,</span>
+   <span class="tp">"categories"</span><span class="tk">:</span> <span class="tk">[</span><span class="ts">"Fashion &amp; apparel"</span><span class="tk">,</span><span class="ts">"Electronics"</span><span class="tk">],</span>
+   <span class="tp">"use_cases"</span><span class="tk">:</span> <span class="tk">[</span><span class="ts">"Order tracking"</span><span class="tk">,</span><span class="ts">"Product recommendations"</span><span class="tk">],</span>
+   <span class="tp">"tools"</span><span class="tk">:</span> <span class="tk">[</span><span class="ts">"knowledgebase"</span><span class="tk">,</span><span class="ts">"google_sheet"</span><span class="tk">],</span>
+   <span class="tp">"agent_mode"</span><span class="tk">:</span> <span class="ts">"hybrid"</span>
+ <span class="tk">},</span>
+ <span class="tp">"additional_requirements"</span><span class="tk">:</span> <span class="tk">[</span>
+   <span class="ts">"Offer free shipping on carts over $50."</span><span class="tk">,</span>
+   <span class="ts">"Always upsell one complementary item."</span>
+ <span class="tk">]</span>
+<span class="tk">}</span></code></pre>
+    </div>
+    <div>
+      <h3>Request — revise (rounds 1–3)</h3>
+<pre><code><span class="tk">{</span>
+ <span class="tp">"current_prompt"</span><span class="tk">:</span> <span class="ts">"&lt;last generated prompt&gt;"</span><span class="tk">,</span>
+ <span class="tp">"round"</span><span class="tk">:</span> <span class="tn">2</span><span class="tk">,</span>
+ <span class="tp">"revision_instructions"</span><span class="tk">:</span> <span class="tk">[</span>
+   <span class="tk">{</span> <span class="tp">"user"</span><span class="tk">:</span> <span class="ts">"where is my order 1042?"</span><span class="tk">,</span>
+     <span class="tp">"agent"</span><span class="tk">:</span> <span class="ts">"&lt;bot reply&gt;"</span><span class="tk">,</span>
+     <span class="tp">"correction"</span><span class="tk">:</span> <span class="ts">"Ask for email before</span>
+        <span class="ts">sharing order status."</span> <span class="tk">}</span>
+ <span class="tk">]</span>
+<span class="tk">}</span>
+<span class="cmt">// same system message; model edits only the</span>
+<span class="cmt">// segment each correction maps to (diff-preserving).</span></code></pre>
+    </div>
+  </div>
+  <p class="footnote">Endpoint mirrors the OpenAI Responses API already used by the image path (<code>POST /v1/responses</code>, <code>gpt-4.1-mini</code>). Keep the key server-side — do not ship it to the client as the reference JSON currently does.</p>
+  <div class="callout warn"><b>Security fix required.</b> The reference EIT JSON hard-codes an OpenAI bearer token in the <code>api</code> node headers. The generator and any runtime API node must read credentials from a server-side vault, never from the exported JSON.</div>
+</section>
+
+<!-- ══ 06 TEST LOOP ══ -->
+<section id="testloop">
+  <h2><span class="sn">06</span>The 3-round test loop</h2>
+  <p class="sdesc">The Test panel is where the user validates behaviour and corrects it inline. Each correction is a revision instruction; three rounds is the hard cap before handoff to the dashboard.</p>
+  <table>
+    <thead><tr><th style="width:12%">Round</th><th>User action</th><th>Backend</th><th style="width:26%">Exit</th></tr></thead>
+    <tbody>
+      <tr><td><b>1</b></td><td>Chats as a customer; clicks "Correct this" on off replies</td><td>Buffer transcript + corrections</td><td>User clicks "Apply &amp; update" → revise call</td></tr>
+      <tr><td><b>2</b></td><td>Re-tests with revised prompt</td><td>Diff-preserving revise; bump <code>round</code></td><td>Apply → revise call</td></tr>
+      <tr><td><b>3</b></td><td>Final validation pass</td><td>Last revise; freeze prompt + schema</td><td><strong>Auto-redirect → <code>goDash()</code></strong>, graph pre-loaded</td></tr>
+    </tbody>
+  </table>
+  <p>State to track per session: <code>round ∈ {1,2,3}</code>, <code>promptVersions[]</code> (keep each for rollback), and the running <code>corrections[]</code> buffer. When <code>round === 3</code> completes, persist the frozen prompt into every <code>node_ai_agent.data.systemPrompt</code>, write <code>responseFormat</code> + set <code>enableResponseFormat=true</code>, then route to the dashboard where <code>buildDashWF()</code> renders the same graph for manual extension.</p>
+  <div class="callout"><b>Why cap at 3.</b> Each round is a full prompt rewrite; unbounded loops drift the prompt away from its segmented base and burn tokens. Three rounds is enough to fix tone, missing steps, and one behaviour gap — anything deeper belongs in the visual builder, which is exactly where round 3 lands the user.</div>
+</section>
+
+<!-- ══ 07 FINAL PROMPT ══ -->
+<section id="final-prompt">
+  <h2><span class="sn">07</span>Final prompt — from the chosen options</h2>
+  <p class="sdesc">Generated for the default onboarding selection: <strong>E-commerce</strong>, categories <strong>Fashion &amp; apparel + Electronics</strong>, use cases <strong>Order tracking + Product recommendations</strong>, mode <strong>hybrid</strong>, tools <strong>knowledgebase + google_sheet</strong>, plus the two quick-add behaviours. This is what lands in <code>node_ai_agent.data.systemPrompt</code>.</p>
+<pre><code><span class="tc">ROLE &amp; GOAL</span>
+You are the Support &amp; Sales Agent for an online store selling fashion &amp;
+apparel and electronics. Your goal is to resolve customer questions and
+convert intent into orders: find the right product, give accurate
+stock / price / link, recommend better-fit alternatives, cross-sell one
+relevant item, and capture leads when purchase intent is high.
+
+<span class="tc">DOMAIN</span>
+Stay inside store scope: products, orders, delivery, returns, offers,
+sizing, and general store policy. Politely refuse unrelated topics.
+
+<span class="tc">TOOLS</span>
+- google_sheet (product search): use for ANY product, price, stock,
+  availability, size/variant, budget, or comparison query — including
+  "do you have X", "is X available", "X in size M?".
+- knowledgebase: use ONLY for non-product topics — delivery options,
+  return &amp; refund policy, payment methods, store hours, contact.
+Never guess stock, price, link, or policy. If a tool is needed, call it.
+
+<span class="tc">DATA / FIELDS</span>
+Product rows carry: Name, Specification, Size/Variant, Price, In Stock,
+Up Coming, Product Link. Availability mapping (always apply):
+- In Stock &gt; 0                → Available
+- In Stock = 0, Up Coming &gt; 0  → Upcoming / pre-arrival
+- In Stock = 0, Up Coming = 0  → Out of stock; offer alternatives
+
+<span class="tc">SELECTION LOGIC</span>
+- Order tracking: ask for the order number (and email to verify) before
+  sharing status; then return status + ETA in one line.
+- Product recommendations: return up to 5 in-stock matches ranked by
+  fit, then value. If no exact match, show the closest and name the
+  difference ("16GB, you asked for 8GB").
+- Budget phrases ("under 50k", "100-120k") → numeric range before filter.
+
+<span class="tc">RESPONSE RULES</span>
+Answer first when you have enough info. Keep replies short and helpful,
+with one clear CTA. Offer free shipping on carts over $50. Always upsell
+exactly one complementary item when relevant. Capture name + email +
+contact when the customer signals buy / book / visit.
+
+<span class="tc">OUTPUT FORMAT</span>
+For product replies, one block per product:
+1. {Product name}
+   - Specification: {clean spec}
+   - Price: {price OR "Price not available yet"}
+   - Availability: {Available | Limited | Upcoming | Out of stock}
+   - Link: {product link if present}
+   - Differences: {only if a requested spec differs}
+
+<span class="tc">SAFETY</span>
+Do not answer out-of-domain questions. Do not discuss competitors except
+to suggest an in-store alternative. Never invent product, stock, price,
+link, offer, or policy. On sensitive or high-value cases, or after 2
+unresolved turns, hand over to a human agent.</code></pre>
+  <p class="footnote">The SAFETY and DOMAIN segments come verbatim from the cached base; ROLE/RESPONSE were composed with the two quick-add requirements; TOOLS/DATA reflect that the store connected a sheet + KB. Swap categories or tools and only the affected segments change.</p>
+</section>
+
+<!-- ══ 08 OUTPUT SCHEMA ══ -->
+<section id="output-schema">
+  <h2><span class="sn">08</span>Output schema — from the chosen options</h2>
+  <p class="sdesc">This JSON Schema is emitted alongside the prompt and written to <code>node_ai_agent.data.responseFormat</code> with <code>enableResponseFormat = true</code>. It matches the OUTPUT FORMAT segment one-to-one, so the runtime can render cards and the QA harness can assert on fields.</p>
+<pre><code><span class="tk">{</span>
+  <span class="tp">"name"</span><span class="tk">:</span> <span class="ts">"store_agent_reply"</span><span class="tk">,</span>
+  <span class="tp">"strict"</span><span class="tk">:</span> <span class="tn">true</span><span class="tk">,</span>
+  <span class="tp">"schema"</span><span class="tk">:</span> <span class="tk">{</span>
+    <span class="tp">"type"</span><span class="tk">:</span> <span class="ts">"object"</span><span class="tk">,</span>
+    <span class="tp">"additionalProperties"</span><span class="tk">:</span> <span class="tn">false</span><span class="tk">,</span>
+    <span class="tp">"properties"</span><span class="tk">:</span> <span class="tk">{</span>
+      <span class="tp">"reply_text"</span><span class="tk">:</span> <span class="tk">{</span> <span class="tp">"type"</span><span class="tk">:</span><span class="ts">"string"</span><span class="tk">,</span> <span class="tp">"description"</span><span class="tk">:</span><span class="ts">"Natural-language message shown to the customer"</span> <span class="tk">},</span>
+      <span class="tp">"intent"</span><span class="tk">:</span> <span class="tk">{</span> <span class="tp">"type"</span><span class="tk">:</span><span class="ts">"string"</span><span class="tk">,</span> <span class="tp">"enum"</span><span class="tk">:</span><span class="tk">[</span><span class="ts">"order_tracking"</span><span class="tk">,</span><span class="ts">"product_reco"</span><span class="tk">,</span><span class="ts">"policy"</span><span class="tk">,</span><span class="ts">"smalltalk"</span><span class="tk">,</span><span class="ts">"handover"</span><span class="tk">]</span> <span class="tk">},</span>
+      <span class="tp">"products"</span><span class="tk">:</span> <span class="tk">{</span>
+        <span class="tp">"type"</span><span class="tk">:</span><span class="ts">"array"</span><span class="tk">,</span> <span class="tp">"maxItems"</span><span class="tk">:</span><span class="tn">5</span><span class="tk">,</span>
+        <span class="tp">"items"</span><span class="tk">:</span> <span class="tk">{</span>
+          <span class="tp">"type"</span><span class="tk">:</span><span class="ts">"object"</span><span class="tk">,</span> <span class="tp">"additionalProperties"</span><span class="tk">:</span><span class="tn">false</span><span class="tk">,</span>
+          <span class="tp">"properties"</span><span class="tk">:</span> <span class="tk">{</span>
+            <span class="tp">"name"</span><span class="tk">:</span> <span class="tk">{</span><span class="tp">"type"</span><span class="tk">:</span><span class="ts">"string"</span><span class="tk">},</span>
+            <span class="tp">"specification"</span><span class="tk">:</span> <span class="tk">{</span><span class="tp">"type"</span><span class="tk">:</span><span class="ts">"string"</span><span class="tk">},</span>
+            <span class="tp">"price"</span><span class="tk">:</span> <span class="tk">{</span><span class="tp">"type"</span><span class="tk">:</span><span class="tk">[</span><span class="ts">"string"</span><span class="tk">,</span><span class="ts">"null"</span><span class="tk">]</span><span class="tk">},</span>
+            <span class="tp">"availability"</span><span class="tk">:</span> <span class="tk">{</span><span class="tp">"type"</span><span class="tk">:</span><span class="ts">"string"</span><span class="tk">,</span> <span class="tp">"enum"</span><span class="tk">:</span><span class="tk">[</span><span class="ts">"Available"</span><span class="tk">,</span><span class="ts">"Limited"</span><span class="tk">,</span><span class="ts">"Upcoming"</span><span class="tk">,</span><span class="ts">"Out of stock"</span><span class="tk">]},</span>
+            <span class="tp">"link"</span><span class="tk">:</span> <span class="tk">{</span><span class="tp">"type"</span><span class="tk">:</span><span class="tk">[</span><span class="ts">"string"</span><span class="tk">,</span><span class="ts">"null"</span><span class="tk">]</span><span class="tk">},</span>
+            <span class="tp">"differences"</span><span class="tk">:</span> <span class="tk">{</span><span class="tp">"type"</span><span class="tk">:</span><span class="tk">[</span><span class="ts">"string"</span><span class="tk">,</span><span class="ts">"null"</span><span class="tk">]</span><span class="tk">,</span> <span class="tp">"description"</span><span class="tk">:</span><span class="ts">"Set only when a requested spec differs"</span><span class="tk">}</span>
+          <span class="tk">},</span>
+          <span class="tp">"required"</span><span class="tk">:</span> <span class="tk">[</span><span class="ts">"name"</span><span class="tk">,</span><span class="ts">"specification"</span><span class="tk">,</span><span class="ts">"price"</span><span class="tk">,</span><span class="ts">"availability"</span><span class="tk">,</span><span class="ts">"link"</span><span class="tk">,</span><span class="ts">"differences"</span><span class="tk">]</span>
+        <span class="tk">}</span>
+      <span class="tk">},</span>
+      <span class="tp">"cross_sell"</span><span class="tk">:</span> <span class="tk">{</span> <span class="tp">"type"</span><span class="tk">:</span><span class="tk">[</span><span class="ts">"string"</span><span class="tk">,</span><span class="ts">"null"</span><span class="tk">]</span><span class="tk">,</span> <span class="tp">"description"</span><span class="tk">:</span><span class="ts">"One complementary item, or null"</span> <span class="tk">},</span>
+      <span class="tp">"lead"</span><span class="tk">:</span> <span class="tk">{</span>
+        <span class="tp">"type"</span><span class="tk">:</span><span class="tk">[</span><span class="ts">"object"</span><span class="tk">,</span><span class="ts">"null"</span><span class="tk">]</span><span class="tk">,</span> <span class="tp">"additionalProperties"</span><span class="tk">:</span><span class="tn">false</span><span class="tk">,</span>
+        <span class="tp">"properties"</span><span class="tk">:</span> <span class="tk">{</span> <span class="tp">"name"</span><span class="tk">:</span><span class="tk">{</span><span class="tp">"type"</span><span class="tk">:</span><span class="tk">[</span><span class="ts">"string"</span><span class="tk">,</span><span class="ts">"null"</span><span class="tk">]},</span> <span class="tp">"email"</span><span class="tk">:</span><span class="tk">{</span><span class="tp">"type"</span><span class="tk">:</span><span class="tk">[</span><span class="ts">"string"</span><span class="tk">,</span><span class="ts">"null"</span><span class="tk">]},</span> <span class="tp">"phone"</span><span class="tk">:</span><span class="tk">{</span><span class="tp">"type"</span><span class="tk">:</span><span class="tk">[</span><span class="ts">"string"</span><span class="tk">,</span><span class="ts">"null"</span><span class="tk">]}</span> <span class="tk">},</span>
+        <span class="tp">"required"</span><span class="tk">:</span> <span class="tk">[</span><span class="ts">"name"</span><span class="tk">,</span><span class="ts">"email"</span><span class="tk">,</span><span class="ts">"phone"</span><span class="tk">]</span>
+      <span class="tk">},</span>
+      <span class="tp">"handover"</span><span class="tk">:</span> <span class="tk">{</span> <span class="tp">"type"</span><span class="tk">:</span><span class="ts">"boolean"</span><span class="tk">,</span> <span class="tp">"description"</span><span class="tk">:</span><span class="ts">"true → route to a human per handover triggers"</span> <span class="tk">}</span>
+    <span class="tk">},</span>
+    <span class="tp">"required"</span><span class="tk">:</span> <span class="tk">[</span><span class="ts">"reply_text"</span><span class="tk">,</span><span class="ts">"intent"</span><span class="tk">,</span><span class="ts">"products"</span><span class="tk">,</span><span class="ts">"cross_sell"</span><span class="tk">,</span><span class="ts">"lead"</span><span class="tk">,</span><span class="ts">"handover"</span><span class="tk">]</span>
+  <span class="tk">}</span>
+<span class="tk">}</span></code></pre>
+  <p><code>reply_text</code> is what <code>node_response_to_chat</code> streams; <code>products</code>/<code>cross_sell</code> drive rich cards; <code>handover=true</code> is read by the conditional/routing layer when mode is <code>hybrid</code> or <code>human</code>.</p>
+</section>
+
+<!-- ══ 09 MAPPING ══ -->
+<section id="mapping">
+  <h2><span class="sn">09</span>Onboarding → JSON field mapping</h2>
+  <p class="sdesc">The generator's write map. Read left, write right.</p>
+  <table>
+    <thead><tr><th style="width:30%">Onboarding input</th><th>Target in Agent JSON</th></tr></thead>
+    <tbody>
+      <tr><td><code>agentName</code> / fallback <code>agName()</code></td><td><code>name</code>, <code>displayName</code>, <code>designation</code></td></tr>
+      <tr><td><code>greeting</code></td><td><code>nodes[trigger].data.initialMsg</code></td></tr>
+      <tr><td><code>selInd</code> + <code>selSubs</code></td><td>prompt <code>{cat}</code>, <code>tool_knowledgebase.description</code>, tool selection</td></tr>
+      <tr><td><code>selUCs</code></td><td>prompt SELECTION LOGIC / RESPONSE segments; sub-agent suggestions (<code>WFC</code>)</td></tr>
+      <tr><td><code>customPrompt</code> + quick-add (<code>QA</code>)</td><td>Generator <code>additional_requirements[]</code></td></tr>
+      <tr><td><code>agentMode</code></td><td>presence of handover routing; <code>handover</code> field consumption</td></tr>
+      <tr><td><code>handoverTriggers</code></td><td><code>node_conditional.conditions[]</code> branches</td></tr>
+      <tr><td><code>kbDocs</code> / <code>kbCrawl</code></td><td><code>tool_knowledgebase.knowledgeBaseIds[]</code></td></tr>
+      <tr><td><code>storeOk</code> / <code>prodSync</code></td><td><code>tool_google_sheet</code> (documentId, sheetName, get_rows)</td></tr>
+      <tr><td>image support (implicit for ecom)</td><td><code>node_conditional</code> image branch → <code>node_api_action</code> (vision) → second <code>node_ai_agent</code></td></tr>
+      <tr><td>test corrections (<code>chatMsgs</code>)</td><td>Generator <code>revision_instructions[]</code> → all <code>systemPrompt</code></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ══ 10 EMITTED JSON ══ -->
+<section id="emit">
+  <h2><span class="sn">10</span>Emitted Agent JSON (skeleton)</h2>
+  <p class="sdesc">The final document the generator persists and the dashboard loads. Prompt (§07) and schema (§08) drop into the two <code>node_ai_agent</code> nodes; ids are freshly minted but machine <code>name</code>s stay fixed for the <code>{{local.*}}</code> references.</p>
+<pre><code><span class="tk">{</span>
+  <span class="tp">"accountId"</span><span class="tk">:</span> <span class="ts">"&lt;from session&gt;"</span><span class="tk">,</span>
+  <span class="tp">"name"</span><span class="tk">:</span> <span class="ts">"&lt;agentName&gt;"</span><span class="tk">,</span>
+  <span class="tp">"designation"</span><span class="tk">:</span> <span class="ts">"&lt;agentName&gt; AI Assistant"</span><span class="tk">,</span>
+  <span class="tp">"status"</span><span class="tk">:</span> <span class="tn">true</span><span class="tk">,</span>
+  <span class="tp">"nodes"</span><span class="tk">:</span> <span class="tk">[</span>
+    <span class="tk">{</span> <span class="tp">"name"</span><span class="tk">:</span><span class="ts">"on_chat_message"</span><span class="tk">,</span> <span class="tp">"type"</span><span class="tk">:</span><span class="ts">"trigger_chat_message"</span><span class="tk">,</span> <span class="tp">"category"</span><span class="tk">:</span><span class="ts">"trigger"</span><span class="tk">,</span>
+      <span class="tp">"data"</span><span class="tk">:</span><span class="tk">{</span> <span class="tp">"initialMsg"</span><span class="tk">:</span><span class="ts">"&lt;greeting&gt;"</span><span class="tk">,</span> <span class="tp">"chatSource"</span><span class="tk">:</span><span class="ts">"website"</span><span class="tk">,</span> <span class="tp">"responseMode"</span><span class="tk">:</span><span class="ts">"LAST_NODE"</span> <span class="tk">}</span> <span class="tk">},</span>
+
+    <span class="tk">{</span> <span class="tp">"name"</span><span class="tk">:</span><span class="ts">"condition"</span><span class="tk">,</span> <span class="tp">"type"</span><span class="tk">:</span><span class="ts">"node_conditional"</span><span class="tk">,</span> <span class="tp">"category"</span><span class="tk">:</span><span class="ts">"node"</span><span class="tk">,</span>
+      <span class="tp">"data"</span><span class="tk">:</span><span class="tk">{</span> <span class="tp">"conditions"</span><span class="tk">:</span><span class="tk">[</span> <span class="cmt">/* [0]=text, [1]=image on query.type */</span> <span class="tk">]</span> <span class="tk">}</span> <span class="tk">},</span>
+
+    <span class="tk">{</span> <span class="tp">"name"</span><span class="tk">:</span><span class="ts">"ai_agent_1"</span><span class="tk">,</span> <span class="tp">"type"</span><span class="tk">:</span><span class="ts">"node_ai_agent"</span><span class="tk">,</span> <span class="tp">"category"</span><span class="tk">:</span><span class="ts">"node"</span><span class="tk">,</span>
+      <span class="tp">"data"</span><span class="tk">:</span><span class="tk">{</span> <span class="tp">"systemPrompt"</span><span class="tk">:</span><span class="ts">"&lt;§07 FINAL PROMPT&gt;"</span><span class="tk">,</span>
+             <span class="tp">"inputPrompt"</span><span class="tk">:</span><span class="ts">"{{local.on_chat_message.body.query.message.text}}"</span><span class="tk">,</span>
+             <span class="tp">"enableResponseFormat"</span><span class="tk">:</span><span class="tn">true</span><span class="tk">,</span> <span class="tp">"responseFormat"</span><span class="tk">:</span><span class="ts">"&lt;§08 OUTPUT SCHEMA&gt;"</span><span class="tk">,</span>
+             <span class="tp">"llmModel"</span><span class="tk">:</span><span class="tk">{</span><span class="tp">"provider"</span><span class="tk">:</span><span class="ts">"openai"</span><span class="tk">,</span><span class="tp">"model"</span><span class="tk">:</span><span class="ts">"gpt-4o-mini"</span><span class="tk">}</span> <span class="tk">}</span> <span class="tk">},</span>
+
+    <span class="tk">{</span> <span class="tp">"name"</span><span class="tk">:</span><span class="ts">"api"</span><span class="tk">,</span>          <span class="tp">"type"</span><span class="tk">:</span><span class="ts">"node_api_action"</span><span class="tk">,</span>       <span class="cmt">// vision: image → product name</span> <span class="tk">},</span>
+    <span class="tk">{</span> <span class="tp">"name"</span><span class="tk">:</span><span class="ts">"ai_agent"</span><span class="tk">,</span>     <span class="tp">"type"</span><span class="tk">:</span><span class="ts">"node_ai_agent"</span><span class="tk">,</span>        <span class="cmt">// inputPrompt = {{local.api...text}}</span> <span class="tk">},</span>
+    <span class="tk">{</span> <span class="tp">"name"</span><span class="tk">:</span><span class="ts">"response_to_chat"</span><span class="tk">,</span>   <span class="tp">"type"</span><span class="tk">:</span><span class="ts">"node_response_to_chat"</span><span class="tk">,</span> <span class="cmt">// {{local.ai_agent_1.output}}</span> <span class="tk">},</span>
+    <span class="tk">{</span> <span class="tp">"name"</span><span class="tk">:</span><span class="ts">"response_to_chat_1"</span><span class="tk">,</span> <span class="tp">"type"</span><span class="tk">:</span><span class="ts">"node_response_to_chat"</span><span class="tk">,</span> <span class="cmt">// {{local.ai_agent.output}}</span> <span class="tk">},</span>
+    <span class="tk">{</span> <span class="tp">"name"</span><span class="tk">:</span><span class="ts">"eit_knowledgebase_tool"</span><span class="tk">,</span> <span class="tp">"type"</span><span class="tk">:</span><span class="ts">"tool_knowledgebase"</span><span class="tk">,</span> <span class="tp">"category"</span><span class="tk">:</span><span class="ts">"tool"</span> <span class="tk">},</span>
+    <span class="tk">{</span> <span class="tp">"name"</span><span class="tk">:</span><span class="ts">"google_sheet"</span><span class="tk">,</span>          <span class="tp">"type"</span><span class="tk">:</span><span class="ts">"tool_google_sheet"</span><span class="tk">,</span>  <span class="tp">"category"</span><span class="tk">:</span><span class="ts">"tool"</span> <span class="tk">}</span>
+  <span class="tk">],</span>
+  <span class="tp">"edges"</span><span class="tk">:</span> <span class="tk">{</span> <span class="cmt">/* exactly as §03: trigger→condition→{agent_1|api}→response, tools bound to both agents */</span> <span class="tk">}</span>
+<span class="tk">}</span></code></pre>
+  <div class="callout"><b>Build order for the generator.</b> (1) mint node ids + fixed names → (2) fill trigger from <code>greeting</code> → (3) fill tools from KB/store state → (4) drop frozen prompt + schema into both agents → (5) build <code>edges</code> from the template, binding tools to agents and wiring the conditional branch indexes → (6) attach <code>accountId</code>/<code>creator</code> → (7) persist &amp; hand to <code>buildDashWF()</code>.</div>
+</section>
+
+<hr class="soft">
+<p class="footnote">Reference agent: EIT Agent V2. Reference wizard: REVE Chat multi-category onboarding. This handover describes generation logic, not the deployed runtime.</p>
+
+</main>
+</div>
+
+<script>
+// active section highlight in the index rail
+const links=[...document.querySelectorAll('#idx a')];
+const map=new Map(links.map(a=>[a.getAttribute('href').slice(1),a]));
+const obs=new IntersectionObserver((es)=>{
+  es.forEach(e=>{
+    if(e.isIntersecting){
+      links.forEach(l=>{l.classList.remove('on');l.parentElement.classList.remove('on');});
+      const a=map.get(e.target.id);
+      if(a){a.classList.add('on');a.parentElement.classList.add('on');}
+    }
+  });
+},{rootMargin:'-10% 0px -75% 0px',threshold:0});
+document.querySelectorAll('section,.hero').forEach(s=>{if(s.id)obs.observe(s);});
+</script>
+</body>
+</html>

@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Let's build your AI agent — Onboarding</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#6366F1; --blue-d:#4F46E5; --blue-t:#EEF2FF; --blue-b:#818CF8;
+  --purple:#6366F1; --purple-t:#EEF2FF;
+  --green:#16A34A; --green-t:#DCFCE7;
+  --amber-bg:#FEF9F0; --amber-bd:#FCE9C8; --amber-t:#FEF3C7;
+  --red:#DC2626; --red-t:#FEF2F2;
+  --ink:#111827; --muted:#6B7280; --faint:#9CA3AF;
+  --line:#E5E7EB; --line2:#F3F4F6; --bg:#EEF0F4; --card:#FFFFFF;
+  --sans:'Inter',system-ui,-apple-system,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --ease:cubic-bezier(.2,.8,.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+#root{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:14px}
+button{font-family:inherit;cursor:pointer}
+button:focus-visible,.opt-card:focus-visible,.chip:focus-visible,.mode:focus-visible,.st.done:focus-visible,.qchip:focus-visible,.drop:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+input,textarea,select{font-family:inherit;font-size:13.5px;color:var(--ink)}
+::placeholder{color:var(--faint)}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+
+/* ── toast ── */
+.toastwrap{position:fixed;top:22px;left:50%;transform:translateX(-50%) translateY(-140%);z-index:200;display:flex;flex-direction:column;gap:8px;pointer-events:none;transition:transform .35s var(--ease)}
+.toastwrap.show{transform:translateX(-50%) translateY(0)}
+.toast{background:#1F2937;color:#fff;font-size:12.5px;font-weight:500;padding:11px 16px;border-radius:10px;box-shadow:0 12px 30px -8px rgba(0,0,0,.35);display:flex;align-items:center;gap:8px;white-space:nowrap}
+.toast .c{width:16px;height:16px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ── wizard frame ── */
+.frame{width:100%;max-width:1080px;height:calc(100vh - 28px);max-height:660px;background:var(--card);border-radius:18px;box-shadow:0 24px 60px -20px rgba(17,24,39,.25);display:grid;grid-template-columns:266px 1fr;grid-template-rows:minmax(0,1fr);overflow:hidden;border:1px solid var(--line)}
+
+/* sidebar */
+.side{background:linear-gradient(180deg,#F3EEFE 0%,#FBFAFE 34%,#fff 60%);padding:30px 26px;display:flex;flex-direction:column;border-right:1px solid var(--line2);min-height:0;overflow-y:auto}
+.bot{width:46px;height:46px;border-radius:13px;background:#EDE7FB;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.bot svg{width:23px;height:23px}
+.side h1{font-size:16px;font-weight:700;text-align:center;letter-spacing:-.2px}
+.side .sub{font-size:11.5px;color:var(--muted);text-align:center;margin-top:6px;line-height:1.55;max-width:200px;margin-left:auto;margin-right:auto}
+.steps{margin-top:34px;display:flex;flex-direction:column;gap:22px}
+.st{display:flex;align-items:center;gap:12px;border-radius:8px;padding:4px 6px;margin:-4px -6px;transition:background-color .15s}
+.st.done{cursor:pointer}
+.st.done:hover{background:#F1F0FE}
+.st.done:hover .lbl{color:var(--blue)}
+.st .dot{width:19px;height:19px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:1.7px solid #D1D5DB;background:#fff;transition:.2s}
+.st .dot svg{width:10px;height:10px}
+.st.done .dot{background:var(--green);border-color:var(--green)}
+.st.active .dot{border-color:var(--blue);border-width:2px;box-shadow:0 0 0 3px var(--blue-t)}
+.st.active .dot i{width:6px;height:6px;border-radius:50%;background:var(--blue);display:block}
+.st .lbl{font-size:13px;color:var(--faint);font-weight:500;transition:.2s}
+.st.done .lbl,.st.active .lbl{color:var(--ink)}
+.st.active .lbl{font-weight:600}
+
+/* main panel */
+.main{display:flex;flex-direction:column;min-width:0;min-height:0;overflow-y:auto}
+.scroll{padding:32px 40px 26px}
+.ptitle{font-size:20px;font-weight:700;letter-spacing:-.4px}
+.pdesc{font-size:12.5px;color:var(--muted);margin-top:5px;margin-bottom:22px;max-width:64ch}
+
+.field{margin-bottom:17px}
+.flabel{font-size:12.5px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:3px}
+.flabel .req{color:#EF4444}
+.flabel .opt{font-weight:400;color:var(--faint);font-size:11.5px}
+.flabel .multi{font-weight:400;color:var(--faint);font-size:11px}
+.inp{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 12px;outline:none;transition:.15s;background:#fff}
+.inp:focus{border-color:var(--blue-b);box-shadow:0 0 0 3px var(--blue-t)}
+textarea.inp{resize:vertical;min-height:76px;line-height:1.55}
+select.inp{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%236B7280' stroke-width='1.8' viewBox='0 0 24 24'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px;cursor:pointer}
+
+/* grids */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.opt-card{border:1px solid var(--line);border-radius:11px;padding:12px 13px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:border-color .15s,background-color .15s,box-shadow .15s,transform .15s;background:#fff;user-select:none}
+.opt-card:hover{border-color:#C7D2FE;background:#FBFBFF;transform:translateY(-1px)}
+.opt-card:active{transform:translateY(0) scale(.98)}
+.opt-card.sel{border-color:var(--blue-b);background:var(--blue-t);box-shadow:0 0 0 2.5px rgba(59,130,246,.12) inset}
+.opt-card .em{font-size:16px;line-height:1;width:20px;text-align:center;flex-shrink:0}
+.opt-card .oc-t{font-size:13px;font-weight:500}
+.opt-card .oc-d{font-size:11px;color:var(--muted);margin-top:1px}
+.field.err-flash .opt-card,.field.err-flash .chip{border-color:var(--red)}
+.field.err-flash{animation:shake .32s}
+@keyframes shake{20%,60%{transform:translateX(-4px)}40%,80%{transform:translateX(4px)}}
+.chip{border:1px solid var(--line);border-radius:9px;padding:11px 13px;display:flex;align-items:center;gap:9px;cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .15s;background:#fff;font-size:13px;font-weight:500;user-select:none}
+.chip:hover{border-color:#C7D2FE;transform:translateY(-1px)}
+.chip:active{transform:translateY(0) scale(.98)}
+.chip.sel{border-color:var(--blue-b);background:#fff;box-shadow:0 0 0 1.5px var(--blue-b) inset}
+.chip .em{font-size:15px}
+
+/* mode cards */
+.mode{border:1.5px solid var(--line);border-radius:13px;padding:15px 16px;display:flex;gap:13px;cursor:pointer;transition:border-color .15s,background-color .15s,transform .15s,box-shadow .15s;background:#fff;align-items:flex-start;margin-bottom:11px}
+.mode:hover{border-color:#C7D2FE;box-shadow:0 4px 14px -8px rgba(17,24,39,.18)}
+.mode:active{transform:scale(.995)}
+.mode.sel{border-color:var(--blue-b);background:var(--blue-t)}
+.mode .radio{width:18px;height:18px;border-radius:50%;border:2px solid #D1D5DB;flex-shrink:0;margin-top:2px;position:relative;transition:.15s}
+.mode.sel .radio{border-color:var(--blue)}
+.mode.sel .radio::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--blue)}
+.mode .mt{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}
+.mode .md{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5}
+.tagr{font-size:10px;font-weight:600;color:var(--green);background:var(--green-t);padding:2px 8px;border-radius:20px}
+
+/* sub-industry section divider */
+.subhead{font-size:12.5px;font-weight:600;margin:6px 0 8px}
+.subhead .multi{font-weight:400;color:var(--faint);font-size:11px}
+
+/* upload */
+.drop{border:1.5px dashed #D1D5DB;border-radius:11px;padding:20px;text-align:center;background:#FAFAFB;cursor:pointer;transition:border-color .15s,background-color .15s,transform .1s}
+.drop:hover{border-color:var(--blue-b);background:var(--blue-t)}
+.drop:active{transform:scale(.99)}
+.drop.dragover{border-color:var(--blue);background:var(--blue-t);box-shadow:0 0 0 3px rgba(99,102,241,.15) inset}
+.drop .cloud{width:34px;height:34px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center}
+.drop .dt{font-size:13px}
+.drop .dt b{color:var(--blue);font-weight:600}
+.drop .ds{font-size:11px;color:var(--faint);margin-top:3px}
+.fileitem{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:9px;padding:9px 12px;margin-top:8px;font-size:12.5px;background:#fff}
+.fileitem .x{margin-left:auto;color:var(--faint);cursor:pointer;background:none;border:none;padding:2px 5px;border-radius:5px}
+.fileitem .x:hover{color:#EF4444;background:#FEF2F2}
+.card-box{border:1px solid var(--line);border-radius:12px;padding:15px 16px;margin-bottom:14px}
+.cb-head{display:flex;align-items:flex-start;gap:11px;margin-bottom:12px}
+.cb-ic{width:30px;height:30px;border-radius:8px;background:var(--purple-t);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px}
+.cb-t{font-size:13.5px;font-weight:600}
+.cb-t .opt{font-weight:400;color:var(--faint);font-size:11px}
+.cb-d{font-size:11.5px;color:var(--muted);margin-top:1px}
+
+/* store dropdown */
+.storewrap{position:relative}
+.storemenu{position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 30px -8px rgba(0,0,0,.18);padding:5px;z-index:20;min-width:170px}
+.storemenu button{display:flex;align-items:center;gap:9px;width:100%;text-align:left;background:none;border:none;padding:9px 11px;border-radius:7px;font-size:13px;font-weight:500}
+.storemenu button:hover{background:var(--line2)}
+.storemenu .em{font-size:15px}
+
+/* handover team rows */
+.tmrow{display:grid;grid-template-columns:1fr 1fr 130px 26px;gap:8px;margin-bottom:8px;align-items:center}
+.addagent{display:inline-flex;align-items:center;gap:6px;background:#F3F4F6;border:none;border-radius:8px;padding:8px 13px;font-size:12.5px;font-weight:500;color:var(--ink);margin-top:2px}
+.addagent:hover{background:#E5E7EB}
+
+/* footer */
+.foot{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--line2);padding:16px 40px;display:flex;align-items:center;gap:14px;z-index:5}
+.btn{border:none;border-radius:9px;padding:10px 20px;font-size:13.5px;font-weight:600;transition:background-color .15s,transform .1s,box-shadow .15s}
+.btn:active{transform:scale(.97)}
+.btn-p{background:var(--blue);color:#fff}
+.btn-p:hover{background:var(--blue-d);box-shadow:0 4px 12px -4px rgba(79,70,229,.45)}
+.btn-p:disabled{background:#C7D2FE;cursor:not-allowed;box-shadow:none;transform:none}
+.btn-s{background:#F3F4F6;color:#374151}
+.btn-s:hover{background:#E5E7EB}
+.btn-txt{background:none;color:var(--blue);font-weight:600;font-size:13px}
+.spacer{flex:1}
+.skip{color:var(--blue);font-weight:600;font-size:13px;background:none;border:none;border-radius:6px;padding:6px 8px;transition:background-color .15s}
+.skip:hover{background:var(--blue-t)}
+.stepcount{font-size:11px;color:var(--faint);text-align:center;margin-top:2px;font-weight:500}
+
+/* ── TEST SCREEN ── */
+.test-frame{width:100%;max-width:1180px;height:calc(100vh - 28px);max-height:660px;background:var(--card);border-radius:18px;box-shadow:0 24px 60px -20px rgba(17,24,39,.25);border:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;grid-template-rows:minmax(0,1fr);overflow:hidden}
+.tp-left{border-right:1px solid var(--line2);display:flex;flex-direction:column;min-width:0;min-height:0}
+.tp-tabs{display:flex;gap:4px;padding:16px 22px 0;border-bottom:1px solid var(--line2)}
+.tp-tab{padding:9px 14px;font-size:12.5px;font-weight:600;color:var(--muted);border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tp-tab.on{color:var(--blue);border-bottom-color:var(--blue)}
+.tp-body{flex:1;min-height:0;overflow-y:auto;padding:24px}
+
+.profhead{font-size:16px;font-weight:700}
+.profsub{font-size:12px;color:var(--muted);margin-top:3px;margin-bottom:18px}
+.avatar{width:52px;height:52px;border-radius:14px;background:conic-gradient(from 210deg,#A78BFA,#60A5FA,#34D399,#A78BFA);display:flex;align-items:center;justify-content:center;margin-bottom:18px;position:relative}
+.avatar svg{width:26px;height:26px}
+.avatar .edit{position:absolute;right:-4px;bottom:-4px;width:20px;height:20px;border-radius:50%;background:var(--blue);border:2px solid #fff;display:flex;align-items:center;justify-content:center}
+.avatar .edit svg{width:10px;height:10px}
+
+/* generated prompt view */
+.gp{font-family:var(--mono);font-size:12px;line-height:1.75;background:#0F172A;border-radius:12px;padding:18px 20px;color:#CBD5E1;white-space:pre-wrap;word-break:break-word}
+.gp .h{color:#7DD3FC}
+.gp .v{color:#FDE68A;background:rgba(253,230,138,.09);border-radius:3px;padding:0 3px}
+.gp .learned{color:#86EFAC}
+.gp-note{font-size:11.5px;color:var(--muted);margin-top:12px;display:flex;gap:7px;align-items:flex-start}
+.gp-legend{display:flex;gap:14px;margin-bottom:12px;font-size:11px;color:var(--muted);flex-wrap:wrap}
+.gp-legend span{display:inline-flex;align-items:center;gap:5px}
+.gp-legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+
+/* chat */
+.chat{display:flex;flex-direction:column;min-width:0;min-height:0;background:#fff}
+.chat-head{display:flex;align-items:center;justify-content:space-between;padding:15px 20px;border-bottom:1px solid var(--line2)}
+.chat-head .who{display:flex;align-items:center;gap:9px;font-weight:600;font-size:14px}
+.chat-head .who .cav{width:26px;height:26px;border-radius:8px;background:var(--purple-t);display:flex;align-items:center;justify-content:center;font-size:13px}
+.chat-actions{display:flex;gap:16px}
+.chat-actions button{background:none;border:none;font-size:12px;color:var(--muted);font-weight:500;display:flex;align-items:center;gap:5px}
+.chat-actions button:hover{color:var(--ink)}
+.chat-body{flex:1;min-height:0;overflow-y:auto;padding:20px 22px;background:#fff;display:flex;flex-direction:column;gap:6px}
+.tstamp{font-size:10.5px;color:var(--faint);margin:8px 0 2px}
+.msg-ai{max-width:78%;background:#F3F4F6;border-radius:4px 12px 12px 12px;padding:10px 13px;font-size:13px;line-height:1.5;align-self:flex-start}
+.msg-ai.hi{border:1.5px solid var(--blue-b);background:#fff}
+.msg-user-w{display:flex;flex-direction:column;align-items:flex-end}
+.msg-user{max-width:78%;background:#1F2937;color:#fff;border-radius:12px 12px 4px 12px;padding:10px 13px;font-size:13px;align-self:flex-end}
+.msg-row{display:flex;flex-direction:column;gap:2px}
+.correct-link{font-size:11px;color:var(--blue);background:none;border:none;font-weight:600;align-self:flex-start;margin-top:3px;padding:1px 0;display:flex;align-items:center;gap:4px}
+.correct-link:hover{text-decoration:underline}
+.cbox{background:var(--amber-bg);border:1px solid var(--amber-bd);border-radius:11px;padding:13px 14px;margin-top:8px;align-self:stretch;max-width:88%}
+.cbox-t{font-size:12px;font-weight:600;color:#92400E;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.cbox textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-size:12.5px;line-height:1.5;resize:vertical;min-height:60px;outline:none;background:#fff}
+.cbox textarea:focus{border-color:var(--blue-b);box-shadow:0 0 0 3px var(--blue-t)}
+.cbox-btns{display:flex;gap:8px;margin-top:9px}
+.cbox-btns .btn{padding:7px 15px;font-size:12.5px}
+.applied{font-size:11.5px;color:var(--green);display:flex;align-items:center;gap:6px;margin-top:6px;background:var(--green-t);padding:6px 10px;border-radius:7px;align-self:flex-start}
+.logline{font-size:10.5px;color:#9CA3AF;font-family:var(--mono);margin-top:2px;align-self:flex-start;background:#F9FAFB;border:1px solid var(--line2);padding:3px 8px;border-radius:6px}
+.chat-in{border-top:1px solid var(--line2);padding:13px 18px;display:flex;align-items:center;gap:10px}
+.chat-in .paper,.chat-in .emoji,.chat-in .mic{color:var(--faint);display:flex;align-items:center}
+.chat-in input{flex:1;border:1px solid var(--line);border-radius:22px;padding:10px 16px;outline:none}
+.chat-in input:focus{border-color:var(--blue-b);box-shadow:0 0 0 3px var(--blue-t)}
+.sendbtn{width:36px;height:36px;border-radius:50%;background:var(--blue);border:none;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background-color .15s,transform .1s}
+.sendbtn:hover{background:var(--blue-d)}
+.sendbtn:active{transform:scale(.9)}
+.qchips{display:flex;gap:7px;flex-wrap:wrap;padding:0 20px 14px}
+.qchip{font-size:11.5px;border:1px solid var(--line);background:#fff;border-radius:16px;padding:5px 11px;color:var(--muted);transition:border-color .15s,color .15s,transform .1s}
+.qchip:hover{border-color:var(--blue-b);color:var(--blue)}
+.qchip:active{transform:scale(.95)}
+.poweredby{text-align:center;font-size:10.5px;color:var(--faint);padding:0 0 10px}
+
+.tp-cta{padding:12px 18px;border-top:1px solid var(--line2);display:flex;flex-direction:column;gap:9px}
+.cta-info{display:flex;align-items:center;gap:9px;min-width:0}
+.cta-info .mini{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cta-btns{display:flex;gap:8px;justify-content:flex-end}
+.roundpill{font-size:11px;font-weight:600;color:var(--blue);background:var(--blue-t);padding:5px 11px;border-radius:20px}
+.mini{font-size:11.5px;color:var(--muted)}
+
+/* ── AUTH (signup / verify) ── */
+.auth{width:100%;max-width:430px;background:var(--card);border-radius:18px;box-shadow:0 24px 60px -20px rgba(17,24,39,.25);border:1px solid var(--line);padding:34px 34px 30px}
+.auth .bot{margin:0 auto 16px}
+.auth h1{font-size:21px;font-weight:700;text-align:center;letter-spacing:-.3px}
+.auth .sub{font-size:12.5px;color:var(--muted);text-align:center;margin-top:6px;margin-bottom:22px}
+.gbtn{width:100%;border:1px solid var(--line);background:#fff;border-radius:9px;padding:11px;font-size:13.5px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:9px;color:#374151}
+.gbtn:hover{background:#FAFAFB;border-color:#D1D5DB}
+.divider{display:flex;align-items:center;gap:12px;color:var(--faint);font-size:11.5px;margin:16px 0}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--line)}
+.otp-row{display:flex;gap:9px;justify-content:center;margin:6px 0 4px}
+.otp-in{width:46px;height:54px;text-align:center;font-size:22px;font-weight:700;border:1px solid var(--line);border-radius:11px;outline:none}
+.otp-in:focus{border-color:var(--blue-b);box-shadow:0 0 0 3px var(--blue-t)}
+.resend{text-align:center;font-size:12px;color:var(--muted);margin-top:14px}
+.resend a{color:var(--blue);font-weight:600;text-decoration:none;cursor:pointer}
+.mailbox{background:#F9FAFB;border:1px solid var(--line);border-radius:12px;padding:18px;text-align:center;margin-bottom:18px}
+.mailbox .mi{width:40px;height:40px;border-radius:11px;background:var(--purple-t);display:flex;align-items:center;justify-content:center;margin:0 auto 9px}
+.err{font-size:11.5px;color:#DC2626;margin-top:5px;display:none}
+.err.show{display:block}
+
+/* ── GENERATING ── */
+.gen{width:100%;max-width:420px;text-align:center}
+.gen .ring{width:58px;height:58px;margin:0 auto 20px;border-radius:50%;border:3px solid var(--blue-t);border-top-color:var(--blue);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.gen h2{font-size:19px;font-weight:700;letter-spacing:-.3px}
+.gen p{font-size:13px;color:var(--muted);margin-top:6px}
+.gen .tasks{margin-top:22px;text-align:left;display:inline-block}
+.gen .tk{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--muted);margin:7px 0;opacity:0;animation:fadein .4s forwards}
+.gen .tk:nth-child(1){animation-delay:.1s}.gen .tk:nth-child(2){animation-delay:.5s}.gen .tk:nth-child(3){animation-delay:.9s}.gen .tk:nth-child(4){animation-delay:1.3s}
+@keyframes fadein{to{opacity:1}}
+.gen .tk .c{width:16px;height:16px;border-radius:50%;background:var(--green-t);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ── SUMMARY ── */
+.sumwrap{width:100%;max-width:760px;height:calc(100vh - 28px);max-height:660px;background:var(--card);border-radius:18px;border:1px solid var(--line);box-shadow:0 24px 60px -20px rgba(17,24,39,.25);display:flex;flex-direction:column;overflow:hidden}
+.sum-scroll{flex:1;min-height:0;overflow-y:auto;padding:30px 34px}
+.sum-head{display:flex;align-items:flex-start;gap:14px;margin-bottom:6px}
+.sum-badge{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sum-badge.ok{background:var(--green-t)} .sum-badge.warn{background:var(--amber-t)}
+.sum-head h1{font-size:21px;font-weight:700;letter-spacing:-.3px}
+.sum-head .s{font-size:13px;color:var(--muted);margin-top:2px}
+.banner{border-radius:11px;padding:14px 16px;font-size:13px;margin:14px 0;display:flex;gap:11px;align-items:flex-start;line-height:1.55}
+.banner.warn{background:var(--amber-bg);border:1px solid var(--amber-bd);color:#7c4a08}
+.banner.ok{background:var(--green-t);border:1px solid #BBE9C9;color:#14532D}
+.banner b{font-weight:600}
+.sumgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.sumcard{border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.sumcard .h{font-family:var(--mono);font-size:10px;letter-spacing:.6px;text-transform:uppercase;color:var(--faint);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.sumcard .row{font-size:13px;margin-bottom:5px;color:#25303F}
+.sumcard .row b{font-weight:600}
+.sumcard .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:3px}
+.mchip{font-size:11.5px;background:#F1F4F9;border-radius:16px;padding:3px 10px;color:#374151}
+.promptcard{border:1px solid var(--line);border-radius:12px;margin-top:12px;overflow:hidden}
+.promptcard .ph{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;border-bottom:1px solid var(--line2);background:#FBFCFD}
+.promptcard .ph b{font-size:12.5px}
+.promptcard pre{margin:0;padding:14px 16px;font-family:var(--mono);font-size:11.5px;line-height:1.7;color:#334155;background:#fff;max-height:170px;overflow:auto;white-space:pre-wrap}
+.promptcard .v{color:#B45309;background:#FBF1E0;border-radius:3px;padding:0 3px}
+.promptcard .ln{color:#15803D}
+.sum-foot{border-top:1px solid var(--line2);padding:14px 34px;display:flex;align-items:center;gap:12px}
+
+/* ── BUILDER ── */
+.bld{width:100%;max-width:1120px;height:calc(100vh - 28px);max-height:660px;background:var(--card);border-radius:18px;border:1px solid var(--line);box-shadow:0 24px 60px -20px rgba(17,24,39,.25);display:grid;grid-template-columns:210px 1fr;grid-template-rows:minmax(0,1fr);overflow:hidden}
+.bld-nav{border-right:1px solid var(--line2);padding:20px 16px;background:#FAFBFD;min-height:0;overflow-y:auto}
+.bld-logo{display:flex;align-items:center;gap:8px;margin-bottom:22px;font-weight:700;font-size:14px}
+.bld-logo .g{width:26px;height:26px;border-radius:7px;background:var(--purple-t);display:flex;align-items:center;justify-content:center}
+.nv{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;font-size:12.5px;color:var(--muted);font-weight:500;cursor:pointer;margin-bottom:2px}
+.nv.on{background:var(--blue-t);color:var(--blue);font-weight:600}
+.nv:hover:not(.on){background:#F1F4F9}
+.bld-main{display:flex;flex-direction:column;min-width:0;min-height:0;overflow-y:auto}
+.bld-top{display:flex;align-items:center;justify-content:space-between;padding:20px 26px;border-bottom:1px solid var(--line2)}
+.bld-top h1{font-size:17px;font-weight:700}
+.bld-top .s{font-size:12px;color:var(--muted);margin-top:2px}
+.livepill{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--green);background:var(--green-t);padding:5px 11px;border-radius:20px}
+.livepill .d{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px rgba(21,128,61,.15)}
+.bld-body{padding:26px 28px}
+.canvas{border:1px solid var(--line);border-radius:13px;background:linear-gradient(#F8FAFC 1px,transparent 1px),linear-gradient(90deg,#F8FAFC 1px,transparent 1px);background-size:20px 20px;background-color:#fff;padding:26px 20px;overflow-x:auto}
+.nodes{display:flex;align-items:center;gap:10px;min-width:640px}
+.node{border:1px solid var(--line);border-radius:10px;padding:10px 13px;background:#fff;min-width:118px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.node .nt{font-size:12.5px;font-weight:600}
+.node .ns{font-size:10.5px;color:var(--muted);margin-top:1px}
+.node.trig{border-top:3px solid #B26A08}.node.cond{border-top:3px solid #7A3DB8}.node.ai{border-top:3px solid var(--blue)}.node.resp{border-top:3px solid #0E7A54}
+.node.dashed{border:1.5px dashed #C4B5FD;background:#F5F3FF;cursor:pointer}
+.arw{color:#CBD5E1;font-family:var(--mono);flex-shrink:0}
+.tools-row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.tool-node{border:1px solid var(--teal-b,#0B6E80);border-radius:9px;padding:8px 12px;font-size:12px;background:#E2F1F3;color:#0B6E80;display:flex;align-items:center;gap:7px}
+.bld-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.addbtn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 13px;font-size:12px;color:#374151;font-weight:500}
+.addbtn:hover{border-color:var(--blue-b);color:var(--blue)}
+.cfg{border:1px solid var(--line);border-radius:13px;margin-top:18px;overflow:hidden}
+.cfg .ch{padding:12px 16px;border-bottom:1px solid var(--line2);background:#FBFCFD;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:space-between}
+.cfgrow{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--line2);font-size:13px;transition:background-color .15s}
+.cfgrow:hover{background:#FAFBFF}
+.cfgrow:last-child{border-bottom:none}
+.cfgrow .k{color:var(--muted)}
+.cfgrow .val{display:flex;align-items:center;gap:10px}
+.cfgrow .edit{color:var(--blue);font-size:12px;font-weight:600;cursor:pointer;padding:3px 8px;border-radius:6px;transition:background-color .15s}
+.cfgrow .edit:hover{background:var(--blue-t)}
+.addbtn{transition:border-color .15s,color .15s,transform .1s}
+.addbtn:active{transform:scale(.96)}
+.node{transition:box-shadow .15s,transform .15s}
+.node.dashed:hover{box-shadow:0 4px 14px -6px rgba(124,58,237,.35);transform:translateY(-1px)}
+
+@media(max-width:900px){
+  .frame{grid-template-columns:1fr}
+  .side{display:none}
+  .sumgrid{grid-template-columns:1fr}
+  .bld{grid-template-columns:1fr}
+  .bld-nav{display:none}
+}
+@media(max-width:720px){
+  .test-frame{grid-template-columns:1fr;max-height:none}
+  .tp-left{display:none}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div class="toastwrap" id="toastwrap"></div>
+
+<script>
+/* ═══════════════ ICONS ═══════════════ */
+const I={
+  bot:'<svg viewBox="0 0 24 24" fill="none" stroke="#6366F1" stroke-width="1.9"><rect x="3" y="8" width="18" height="12" rx="3"/><path d="M12 8V4m-3 8h.01M15 12h.01M8 16h8"/><circle cx="12" cy="4" r="1.2" fill="#7C3AED"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>',
+  arrowR:'<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>',
+  cloud:'<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#9CA3AF" stroke-width="1.5"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.4 18.4A5 5 0 0 0 18 9h-1.3A8 8 0 1 0 3 16.3"/></svg>',
+  doc:'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#6B7280" stroke-width="1.7"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+  store:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#6366F1" stroke-width="1.7"><path d="M3 9l1.5-5h15L21 9M4 9v10a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9M4 9h16"/></svg>',
+  send:'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#fff" stroke-width="1.9"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>',
+  pencil:'<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="#92400E" stroke-width="1.9"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>',
+  pencilB:'<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="#fff" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>',
+  botW:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9"><rect x="3" y="8" width="18" height="12" rx="3"/><path d="M12 8V4m-3 8h.01M15 12h.01M8 16h8"/></svg>',
+  ok:'<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#16A34A" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg>',
+  trash:'<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>',
+  clear:'<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.7"><polyline points="1 4 1 10 7 10"/><path d="M3.5 15a9 9 0 1 0 .5-5L1 10"/></svg>',
+  log:'<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><line x1="8" y1="12" x2="15" y2="12"/><line x1="8" y1="16" x2="13" y2="16"/></svg>',
+  paper:'<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21.4 11.05 12.25 20.2a5 5 0 0 1-7.07-7.07l8.49-8.49a3 3 0 0 1 4.24 4.24l-8.49 8.49a1 1 0 0 1-1.41-1.41l7.78-7.78"/></svg>',
+  emoji:'<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg>',
+  mic:'<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v4"/></svg>',
+  info:'<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#9CA3AF" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
+};
+
+/* ═══════════════ DATA ═══════════════ */
+const STEPS=['Agent mode','Business context','Agent capabilities','Handover & team','Train business data'];
+
+const MODES=[
+  {id:'ai',t:'AI agent only',d:'Your AI agent handles every conversation automatically, around the clock.'},
+  {id:'hybrid',t:'AI + human agents',tag:'Recommended',d:'AI resolves routine queries instantly. Complex or sensitive cases are handed to your team.'},
+  {id:'human',t:'Human agents only',d:'Your team handles all chats. AI assists behind the scenes with suggested replies and context.'},
+];
+const INDUSTRIES=[
+  {id:'ecom',em:'🛒',label:'E-commerce And Retail'},
+  {id:'bfsi',em:'🏛️',label:'BFSI'},
+  {id:'telecom',em:'📱',label:'Telecom'},
+  {id:'travel',em:'✈️',label:'Travel & hospitality'},
+  {id:'saas',em:'☁️',label:'SAAS'},
+  {id:'other',em:'⋯',label:'Others'},
+];
+const SUBS=[
+  {em:'👕',label:'Fashion & apparel'},{em:'💻',label:'Electronics'},{em:'🛋️',label:'Home & furniture'},
+  {em:'🍎',label:'Grocery & food'},{em:'🏋️',label:'Sports & fitness'},{em:'🧴',label:'Beauty & wellness'},
+  {em:'🏪',label:'General retail'},{em:'🎮',label:'Toys & hobbies'},{em:'💎',label:'Luxury & jewelry'},
+];
+const TONES=[
+  {id:'Professional',d:'Clear, polite, and business-focused communication'},
+  {id:'Friendly',d:'Warm, approachable, and conversational'},
+  {id:'Casual',d:'Relaxed, informal, and easy-going'},
+  {id:'Empathetic',d:'Patient, understanding, and reassuring'},
+];
+const CAPS=[
+  {em:'📦',label:'Order tracking'},{em:'🔎',label:'Product recommendations'},
+  {em:'🚚',label:'Shipping queries'},{em:'💬',label:'Customer queries'},
+  {em:'🔄',label:'Returns & refunds'},
+];
+const HANDOVER_WHEN=['24/7','During business hours only','Custom schedule'];
+const SITUATIONS=[
+  'After 2 unresolved turns','Customer explicitly asks for a human',
+  'Negative sentiment detected','Query is marked as complex',
+  'VIP or high-value customer','Outside business hours fallback',
+];
+const STORES=[{em:'🟢',label:'Shopify'},{em:'🟣',label:'Woocommerce'},{em:'🌐',label:'Custom store'}];
+
+/* ═══════════════ STATE ═══════════════ */
+let S={
+  screen:'onboard', step:0,
+  user:{name:'',email:'',password:''}, otp:['','','','','',''],
+  mode:'hybrid',
+  website:'https://lereve.com',
+  industry:'ecom', subs:[0,5,8],
+  agentName:'E-commerce support agent',
+  greeting:"Hi! 👋 I'm here to help. What can I do for you today?",
+  tone:'Professional',
+  caps:[0,1], addCaps:'',
+  handoverWhen:'24/7', situations:[0,1,2],
+  team:[{name:'Mehedi Hasan',email:'support@company.com',role:'Moderator'}],
+  docs:[{name:'Delivery and payment policy.pdf'},{name:'PDF policy documents.pdf'},{name:'Return and refund policy.pdf'}],
+  storeMenu:false, store:null,
+  // test screen
+  tab:'chat', showLog:false, round:1, satisfied:null,
+  chat:[], corrections:[], editingMsg:null,
+};
+
+/* ═══════════════ HELPERS ═══════════════ */
+const industryLabel=()=>INDUSTRIES.find(i=>i.id===S.industry)?.label||'business';
+const subLabels=()=>S.subs.map(i=>SUBS[i]?.label).filter(Boolean);
+const capLabels=()=>S.caps.map(i=>CAPS[i]?.label).filter(Boolean);
+const situationLabels=()=>S.situations.map(i=>SITUATIONS[i]).filter(Boolean);
+const toneDesc=()=>TONES.find(t=>t.id===S.tone)?.d||'';
+function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+/* ═══════════════ TOAST ═══════════════ */
+let toastTimer=null;
+function toast(msg){
+  const w=document.getElementById('toastwrap'); if(!w) return;
+  w.innerHTML=`<div class="toast"><span class="c">${I.check}</span>${esc(msg)}</div>`;
+  w.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>w.classList.remove('show'),2600);
+}
+/* keyboard support for div-based controls (opt-card / chip / mode) */
+function kbActivate(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); e.currentTarget.click(); } }
+
+/* ═══════════════ RENDER ═══════════════ */
+function render(){
+  const R={signup:buildSignup,verify:buildVerify,onboard:onboard,generating:buildGenerating,test:testScreen,summary:buildSummary,builder:buildBuilder};
+  document.getElementById('root').innerHTML = (R[S.screen]||onboard)();
+  const cb=document.getElementById('chatBody'); if(cb) cb.scrollTop=cb.scrollHeight;
+  const f=document.querySelector('.otp-in'); // focus first empty otp
+  if(S.screen==='verify'){const boxes=[...document.querySelectorAll('.otp-in')];const e=boxes.find(b=>!b.value)||boxes[0];if(e)e.focus();}
+}
+
+function sidebar(){
+  return `<div class="side">
+    <div class="bot">${I.bot}</div>
+    <h1>Let's build your AI agent</h1>
+    <div class="sub">Follow these steps to set up an agent that knows your business, speaks your voice, and helps your customers.</div>
+    <div class="steps">${STEPS.map((s,i)=>{
+      const cls=i<S.step?'done':i===S.step?'active':'';
+      const dot=i<S.step?I.check:(i===S.step?'<i></i>':'');
+      const clickable=i<S.step;
+      return `<div class="st ${cls}" ${clickable?`tabindex="0" role="button" onkeydown="kbActivate(event)" onclick="editStep(${i})" title="Jump back to ${esc(s)}"`:''}><div class="dot">${dot}</div><div class="lbl">${s}</div></div>`;
+    }).join('')}</div>
+    <div class="spacer"></div>
+    <div class="stepcount">Step ${S.step+1} of ${STEPS.length}</div>
+  </div>`;
+}
+
+/* ═══════════════ AUTH SCREENS ═══════════════ */
+const GOOGLE_G='<svg width="17" height="17" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.76h3.56c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.56-2.76c-.98.66-2.23 1.06-3.72 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/></svg>';
+const MAIL_BIG='<svg width="20" height="20" fill="none" stroke="#6366F1" stroke-width="1.6" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>';
+
+function buildSignup(){
+  return `<div class="auth">
+    <div class="bot">${I.bot}</div>
+    <h1>Create your account</h1>
+    <div class="sub">Set up an AI agent for your business in a few minutes.</div>
+    <button class="gbtn" onclick="signupGoogle()">${GOOGLE_G} Continue with Google</button>
+    <div class="divider">or</div>
+    <div class="field"><div class="flabel">Full name</div>
+      <input class="inp" value="${esc(S.user.name)}" placeholder="e.g. Sarah Ahmed" oninput="S.user.name=this.value"/></div>
+    <div class="field"><div class="flabel">Work email</div>
+      <input class="inp" id="su-email" value="${esc(S.user.email)}" placeholder="you@company.com" oninput="S.user.email=this.value"/>
+      <div class="err" id="su-email-err">Enter a valid email address.</div></div>
+    <div class="field"><div class="flabel">Password</div>
+      <input class="inp" type="password" value="${esc(S.user.password)}" placeholder="At least 8 characters" oninput="S.user.password=this.value"/>
+      <div class="err" id="su-pass-err">Use at least 8 characters, including a letter and a number.</div></div>
+    <button class="btn btn-p" style="width:100%;padding:11px;margin-top:6px" onclick="submitSignup()">Create account &amp; continue ${I.arrowR}</button>
+    <div class="resend" style="margin-top:14px">Already have an account? <a>Sign in</a></div>
+  </div>`;
+}
+function submitSignup(){
+  const email=S.user.email.trim(), pass=S.user.password;
+  const okEmail=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const okPass=pass.length>=8 && /[a-zA-Z]/.test(pass) && /\d/.test(pass);
+  document.getElementById('su-email-err').classList.toggle('show',!okEmail);
+  document.getElementById('su-pass-err').classList.toggle('show',!okPass);
+  if(!okEmail||!okPass) return;
+  S.screen='verify'; render();
+}
+function signupGoogle(){ if(!S.user.name)S.user.name='Sarah Ahmed'; if(!S.user.email)S.user.email='sarah@lereve.com'; S.screen='onboard'; S.step=0; render(); }
+
+function buildVerify(){
+  const email=S.user.email||'you@company.com';
+  return `<div class="auth">
+    <div class="mailbox"><div class="mi">${MAIL_BIG}</div>
+      <div style="font-size:13.5px;font-weight:600">Verification code sent</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:3px">Enter the 6-digit code we sent to<br><b>${esc(email)}</b></div></div>
+    <div class="otp-row">${[0,1,2,3,4,5].map(i=>`<input class="otp-in" maxlength="1" inputmode="numeric" value="${esc(S.otp[i])}" oninput="otpIn(${i},this.value)" onkeydown="otpKey(event,${i})"/>`).join('')}</div>
+    <div class="err" id="otp-err" style="text-align:center">Enter all 6 digits to continue.</div>
+    <button class="btn btn-p" style="width:100%;padding:11px;margin-top:16px" onclick="verifyOtp()">${I.check} Verify &amp; continue</button>
+    <div class="resend">Didn't get it? <a onclick="toast('A new code has been sent. Enter any 6 digits.')">Resend code</a></div>
+  </div>`;
+}
+function otpIn(i,v){const d=(v||'').replace(/\D/g,'').slice(-1);S.otp[i]=d;const b=[...document.querySelectorAll('.otp-in')];if(b[i])b[i].value=d;if(d&&i<5&&b[i+1])b[i+1].focus();}
+function otpKey(e,i){if(e.key==='Backspace'&&!S.otp[i]&&i>0){const b=[...document.querySelectorAll('.otp-in')];if(b[i-1])b[i-1].focus();}}
+function verifyOtp(){ if(S.otp.filter(Boolean).length<6){document.getElementById('otp-err').classList.add('show');return;} S.screen='onboard'; S.step=0; render(); }
+
+function buildGenerating(){
+  return `<div class="gen">
+    <div class="ring"></div>
+    <h2>Building your agent…</h2>
+    <p>Turning your answers into a working agent — system prompt, output schema, and workflow.</p>
+    <div class="tasks">
+      <div class="tk"><span class="c">${I.ok}</span> Composing the system prompt from your choices</div>
+      <div class="tk"><span class="c">${I.ok}</span> Merging your custom instructions</div>
+      <div class="tk"><span class="c">${I.ok}</span> Generating the output schema &amp; tools</div>
+      <div class="tk"><span class="c">${I.ok}</span> Assembling the agent workflow</div>
+    </div>
+  </div>`;
+}
+
+/* ═══════════════ SUMMARY ═══════════════ */
+function summaryPrompt(){
+  const V=x=>`<span class="v">${esc(x)}</span>`;
+  const caps=capLabels().map(c=>`  - <span class="v">${esc(c)}</span>`).join('\n');
+  const learned=S.corrections.length
+    ? S.corrections.map(c=>`  - <span class="ln">"${esc(c.trigger)}" → "${esc(c.corrected)}"</span>`).join('\n')
+    : '  (none)';
+  return `# ROLE  You are "${V(S.agentName)}", a ${V(S.tone.toLowerCase())} agent for a ${V(industryLabel())} business (${V(subLabels().join(', ')||'general')}).
+# GREETING  "${V(S.greeting)}"
+# CAPABILITIES
+${caps||'  (none)'}
+# HANDOVER  ${V(S.handoverWhen)} · ${situationLabels().length} trigger(s)
+# KNOWLEDGE  ${V(S.docs.length+' docs')}${S.store?', '+V(S.store):''}
+# LEARNED FROM TESTING
+${learned}`;
+}
+function buildSummary(){
+  const sat=S.satisfied===true;
+  const banner = sat
+    ? `<div class="banner ok">${I.ok}<span><b>Your agent passed testing.</b> Everything below is ready. You can still fine-tune anything in the builder before or after deploying.</span></div>`
+    : `<div class="banner warn"><span style="font-size:15px;line-height:1">⚠️</span><span><b>You completed all 3 test rounds but weren't fully satisfied.</b> That's okay — open the <b>builder panel</b> to modify the prompt, add tools, or adjust flows before deploying.</span></div>`;
+  const modeLabel={ai:'AI agent only',hybrid:'AI + human agents',human:'Human agents only'}[S.mode];
+  return `<div class="sumwrap">
+    <div class="sum-scroll">
+      <div class="sum-head">
+        <div class="sum-badge ${sat?'ok':'warn'}">${sat?I.ok:'<span style="font-size:20px">🛠️</span>'}</div>
+        <div><h1>${sat?'Your agent is ready':'Almost there — a few things to refine'}</h1>
+        <div class="s">Review the setup, then continue to the builder.</div></div>
+      </div>
+      ${banner}
+      <div class="sumgrid">
+        <div class="sumcard"><div class="h">${I.bot} Identity</div>
+          <div class="row"><b>${esc(S.agentName)}</b></div>
+          <div class="row" style="color:var(--muted)">Tone · ${esc(S.tone)}</div>
+          <div class="row" style="color:var(--muted);font-size:12px">"${esc(S.greeting)}"</div></div>
+        <div class="sumcard"><div class="h">Mode &amp; industry</div>
+          <div class="row"><b>${modeLabel}</b></div>
+          <div class="row" style="color:var(--muted)">${industryLabel()}</div>
+          <div class="chips">${subLabels().map(s=>`<span class="mchip">${s}</span>`).join('')}</div></div>
+        <div class="sumcard"><div class="h">Capabilities</div>
+          <div class="chips">${capLabels().map(c=>`<span class="mchip">${c}</span>`).join('')||'<span class="mchip">none</span>'}</div>
+          ${S.addCaps.trim()?`<div class="row" style="color:var(--muted);font-size:12px;margin-top:6px">+ ${esc(S.addCaps.trim())}</div>`:''}</div>
+        <div class="sumcard"><div class="h">Handover &amp; team</div>
+          <div class="row">${esc(S.handoverWhen)} · <b>${situationLabels().length}</b> trigger(s)</div>
+          <div class="row" style="color:var(--muted);font-size:12px">${S.team.map(t=>esc(t.name)).join(', ')||'No agents added'}</div></div>
+        <div class="sumcard"><div class="h">Knowledge sources</div>
+          <div class="row"><b>${S.docs.length}</b> document(s)</div>
+          <div class="row" style="color:var(--muted)">${S.store?'Store · '+esc(S.store):'No store connected'}</div></div>
+        <div class="sumcard"><div class="h">Testing</div>
+          <div class="row">Completed <b>${S.round}</b> of 3 round(s)</div>
+          <div class="row" style="color:var(--muted)"><b>${S.corrections.length}</b> learned correction(s)</div></div>
+      </div>
+      <div class="promptcard">
+        <div class="ph"><b>Generated system instruction &amp; output</b><span class="mini">structured output · enabled</span></div>
+        <pre>${summaryPrompt()}</pre>
+      </div>
+    </div>
+    <div class="sum-foot">
+      <button class="btn btn-s" onclick="backToTest()">${I.arrowR2||''}Back to test</button>
+      <div class="spacer"></div>
+      ${sat?`<button class="btn btn-s" onclick="deployAgent()">Deploy now</button>`:''}
+      <button class="btn btn-p" style="padding:10px 18px" onclick="toBuilder()">Open agent builder ${I.arrowR}</button>
+    </div>
+  </div>`;
+}
+
+/* ═══════════════ BUILDER (landing) ═══════════════ */
+function buildBuilder(){
+  const modeLabel={ai:'AI only',hybrid:'AI + Human',human:'Human only'}[S.mode];
+  const nav=[['agent','My agent'],['flow','Workflow'],['kb','Knowledge base'],['analytics','Analytics'],['settings','Settings']];
+  return `<div class="bld">
+    <div class="bld-nav">
+      <div class="bld-logo"><span class="g">${I.bot}</span> REVE Chat</div>
+      ${nav.map((n,i)=>`<div class="nv ${i===1?'on':''}">${n[1]}</div>`).join('')}
+      <div class="nv" style="margin-top:14px" onclick="S.screen='summary';render()">${I.arrowL||'‹'} Back to summary</div>
+    </div>
+    <div class="bld-main">
+      <div class="bld-top">
+        <div><h1>${esc(S.agentName)}</h1><div class="s">${industryLabel()} · ${subLabels().slice(0,2).join(', ')} · ${modeLabel}</div></div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <span class="livepill"><span class="d"></span> ${S.satisfied?'Live':'Draft'}</span>
+          <button class="btn btn-p" style="padding:9px 16px" onclick="deployAgent()">Deploy</button>
+        </div>
+      </div>
+      <div class="bld-body">
+        <div class="banner ok" style="margin-top:0">${I.ok}<span>Everything from onboarding is loaded here as an editable workflow.${S.satisfied===false?' Refine the prompt or nodes below, then deploy.':''}</span></div>
+        <div class="canvas">
+          <div class="nodes">
+            <div class="node trig"><div class="nt">Visitor message</div><div class="ns">Widget trigger</div></div>
+            <span class="arw">──▸</span>
+            <div class="node cond"><div class="nt">Intent router</div><div class="ns">text · image</div></div>
+            <span class="arw">──▸</span>
+            <div class="node ai"><div class="nt">AI agent</div><div class="ns">prompt + schema</div></div>
+            <span class="arw">──▸</span>
+            <div class="node resp"><div class="nt">Reply to customer</div><div class="ns">structured</div></div>
+            <span class="arw">──▸</span>
+            <div class="node dashed" onclick="toast('Sub-agent added to the workflow canvas.')"><div class="nt" style="color:var(--blue)">＋ Add agent</div><div class="ns">sub-agent</div></div>
+          </div>
+          <div class="tools-row">
+            <div class="tool-node">📚 Knowledge base · ${S.docs.length} docs</div>
+            ${S.store?`<div class="tool-node">🛒 ${esc(S.store)} catalog</div>`:''}
+            ${S.mode!=='ai'?`<div class="tool-node">👤 Human handover · ${situationLabels().length}</div>`:''}
+          </div>
+          <div class="bld-actions">
+            <button class="addbtn" onclick="toast('Tool added to the workflow.')">＋ Add tool</button>
+            <button class="addbtn" onclick="toast('Condition added to the workflow.')">＋ Add condition</button>
+            <button class="addbtn" onclick="toast('Action added to the workflow.')">＋ Add action</button>
+          </div>
+        </div>
+        <div class="cfg">
+          <div class="ch">Agent configuration <span class="mini" style="margin-left:8px;font-weight:400">from onboarding — edit anything</span></div>
+          <div class="cfgrow"><span class="k">Mode</span><span class="val">${modeLabel} <span class="edit" onclick="editStep(0)">Edit</span></span></div>
+          <div class="cfgrow"><span class="k">Industry</span><span class="val">${industryLabel()} <span class="edit" onclick="editStep(1)">Edit</span></span></div>
+          <div class="cfgrow"><span class="k">Capabilities</span><span class="val">${capLabels().length} selected <span class="edit" onclick="editStep(2)">Edit</span></span></div>
+          <div class="cfgrow"><span class="k">Handover</span><span class="val">${situationLabels().length} triggers · ${S.team.length} agent(s) <span class="edit" onclick="editStep(3)">Edit</span></span></div>
+          <div class="cfgrow"><span class="k">Knowledge</span><span class="val">${S.docs.length} docs${S.store?' · store':''} <span class="edit" onclick="editStep(4)">Edit</span></span></div>
+          <div class="cfgrow"><span class="k">System prompt</span><span class="val"><span class="mini">${S.corrections.length} learned correction(s)</span> <span class="edit" onclick="toBuilderPrompt()">Edit prompt</span></span></div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+function editStep(n){S.screen='onboard'; S.step=n; render();}
+function toBuilderPrompt(){toast('Opening the full prompt editor — '+S.corrections.length+' learned correction(s) pre-loaded.');}
+
+function onboard(){
+  return `<div class="frame">${sidebar()}<div class="main">
+    <div class="scroll">${[step0,step1,step2,step3,step4][S.step]()}</div>
+    ${footer()}
+  </div></div>`;
+}
+
+function footer(){
+  const showSkip=S.step===4;
+  const last=S.step===STEPS.length-1;
+  return `<div class="foot">
+    <button class="btn btn-s" onclick="prev()" ${S.step===0?'style="visibility:hidden"':''}>Back</button>
+    <div class="spacer"></div>
+    ${showSkip?`<button class="skip" onclick="finish()">Skip for now</button>`:''}
+    <button class="btn btn-p" onclick="${last?'finish()':'next()'}">${last?'Finish & test agent':'Continue'} ${I.arrowR}</button>
+  </div>`;
+}
+
+/* ── STEP 0: Agent mode ── */
+function step0(){
+  return `<div class="ptitle">How should your agent work?</div>
+  <div class="pdesc">Choose how AI and your team share the conversation. You can change this anytime later.</div>
+  ${MODES.map(m=>`<div class="mode ${S.mode===m.id?'sel':''}" tabindex="0" role="button" aria-pressed="${S.mode===m.id}" onkeydown="kbActivate(event)" onclick="set('mode','${m.id}')">
+    <div class="radio"></div>
+    <div><div class="mt">${m.t}${m.tag?`<span class="tagr">${m.tag}</span>`:''}</div><div class="md">${m.d}</div></div>
+  </div>`).join('')}`;
+}
+
+/* ── STEP 1: Business context ── */
+function step1(){
+  return `<div class="ptitle">Tell us about your business</div>
+  <div class="pdesc">We'll use this to shape your agent's personality, suggest the right tools, and tailor it to your industry.</div>
+  <div class="field"><div class="flabel">Website URL</div>
+    <input class="inp" value="${esc(S.website)}" oninput="S.website=this.value" placeholder="https://yourbusiness.com"/></div>
+  <div class="field" id="f-industry"><div class="flabel">Select your industry <span class="req">*</span></div>
+    <div class="g2">${INDUSTRIES.map(i=>`<div class="opt-card ${S.industry===i.id?'sel':''}" tabindex="0" role="button" aria-pressed="${S.industry===i.id}" onkeydown="kbActivate(event)" onclick="setIndustry('${i.id}')">
+      <span class="em">${i.em}</span><span class="oc-t">${i.label}</span></div>`).join('')}</div></div>
+  ${S.industry==='ecom'?`<div class="field" id="f-subs">
+    <div class="subhead">Select your sub-industry <span class="multi">(Multi selection)</span> <span class="req" style="color:#EF4444">*</span></div>
+    <div class="g3">${SUBS.map((s,i)=>`<div class="opt-card ${S.subs.includes(i)?'sel':''}" tabindex="0" role="button" aria-pressed="${S.subs.includes(i)}" onkeydown="kbActivate(event)" onclick="toggle('subs',${i})">
+      <span class="em">${s.em}</span><span class="oc-t">${s.label}</span></div>`).join('')}</div></div>`:''}`;
+}
+
+/* ── STEP 2: Agent capabilities ── */
+function step2(){
+  return `<div class="ptitle">Now, shape what your agent will do for you</div>
+  <div class="pdesc">Give it a name, choose the tasks it handles, and set the tone of its responses.</div>
+  <div class="field" id="f-agentName"><div class="flabel">Agent name <span class="req">*</span></div>
+    <input class="inp" value="${esc(S.agentName)}" oninput="S.agentName=this.value"/></div>
+  <div class="field" id="f-greeting"><div class="flabel">Greeting message <span class="req">*</span></div>
+    <input class="inp" value="${esc(S.greeting)}" oninput="S.greeting=this.value"/></div>
+  <div class="field"><div class="flabel">Agent tone <span class="req">*</span></div>
+    <select class="inp" onchange="set('tone',this.value)">${TONES.map(t=>`<option ${S.tone===t.id?'selected':''} value="${t.id}">${t.id} (${t.d})</option>`).join('')}</select></div>
+  <div class="field" id="f-caps"><div class="flabel">Select agent capabilities <span class="multi">(Multi selection)</span> <span class="req">*</span></div>
+    <div class="g2">${CAPS.map((c,i)=>`<div class="chip ${S.caps.includes(i)?'sel':''}" tabindex="0" role="button" aria-pressed="${S.caps.includes(i)}" onkeydown="kbActivate(event)" onclick="toggle('caps',${i})">
+      <span class="em">${c.em}</span><span>${c.label}</span></div>`).join('')}</div></div>
+  <div class="field"><div class="flabel">Additional capabilities <span class="opt">(optional)</span></div>
+    <textarea class="inp" placeholder="Write more capabilities if you need" oninput="S.addCaps=this.value">${esc(S.addCaps)}</textarea></div>`;
+}
+
+/* ── STEP 3: Handover & team ── */
+function step3(){
+  return `<div class="ptitle">Set up your human handover rules</div>
+  <div class="pdesc">Your agent handles the routine — you decide when a human needs to step in.</div>
+  <div class="field"><div class="flabel">When can human agents receive handovers <span class="req">*</span></div>
+    <select class="inp" onchange="set('handoverWhen',this.value)">${HANDOVER_WHEN.map(w=>`<option ${S.handoverWhen===w?'selected':''}>${w}</option>`).join('')}</select></div>
+  <div class="field" id="f-situations"><div class="flabel">Select situations for human handover <span class="multi">(Multi selection)</span> <span class="req">*</span></div>
+    <div class="g2">${SITUATIONS.map((s,i)=>`<div class="chip ${S.situations.includes(i)?'sel':''}" tabindex="0" role="button" aria-pressed="${S.situations.includes(i)}" onkeydown="kbActivate(event)" onclick="toggle('situations',${i})"><span>${s}</span></div>`).join('')}</div></div>
+  <div class="field"><div class="flabel">Add human agent <span class="opt">(optional)</span></div>
+    ${S.team.map((m,i)=>`<div class="tmrow">
+      <input class="inp" value="${esc(m.name)}" placeholder="Agent name" oninput="S.team[${i}].name=this.value"/>
+      <input class="inp" value="${esc(m.email)}" placeholder="Agent email" oninput="S.team[${i}].email=this.value"/>
+      <select class="inp" onchange="S.team[${i}].role=this.value">${['Agent','Moderator','Admin'].map(r=>`<option ${m.role===r?'selected':''}>${r}</option>`).join('')}</select>
+      <button class="fileitem-x" style="border:none;background:none;color:#9CA3AF;cursor:pointer" onclick="removeTeam(${i})">${I.trash}</button>
+    </div>`).join('')}
+    <div class="tmrow" style="grid-template-columns:1fr 1fr 130px 26px">
+      <input class="inp" placeholder="Agent name" id="tn"/>
+      <input class="inp" placeholder="Agent email" id="te"/>
+      <select class="inp" id="tr"><option>Agent</option><option>Moderator</option><option>Admin</option></select>
+      <span></span>
+    </div>
+    <button class="addagent" onclick="addTeam()">＋ Add agent</button></div>`;
+}
+
+/* ── STEP 4: Train business data ── */
+function step4(){
+  return `<div class="ptitle">Train your agent with your content</div>
+  <div class="pdesc">Connect your website, upload documents, or link your store. You can always add more later.</div>
+  <div class="card-box">
+    <div class="cb-head"><div class="cb-ic">${I.doc}</div>
+      <div><div class="cb-t">Add document <span class="opt">(optional)</span></div>
+      <div class="cb-d">Upload PDFs and other files to give the agent more context</div></div></div>
+    <div class="drop" id="dropzone" tabindex="0" role="button" onkeydown="kbActivate(event)" onclick="addDoc()"
+      ondragover="event.preventDefault();this.classList.add('dragover')"
+      ondragleave="this.classList.remove('dragover')"
+      ondrop="event.preventDefault();this.classList.remove('dragover');addDoc()">
+      <div class="cloud">${I.cloud}</div>
+      <div class="dt">Drag your file here, or <b>click to upload</b></div>
+      <div class="ds">Supported formats: PDF, DOCX, TXT</div></div>
+    ${S.docs.map((d,i)=>`<div class="fileitem">${I.doc}<span>${esc(d.name)}</span><button class="x" onclick="removeDoc(${i})">✕</button></div>`).join('')}
+  </div>
+  <div class="card-box">
+    <div class="cb-head" style="margin-bottom:0"><div class="cb-ic">${I.store}</div>
+      <div style="flex:1"><div class="cb-t">Connect your store <span class="opt">(optional)</span></div>
+      <div class="cb-d">Let your agent handle product questions, recommendations and orders</div></div>
+      <div class="storewrap">
+        ${S.store?`<span class="tagr" style="color:var(--green);background:var(--green-t)">${I.ok} ${S.store}</span>`:
+        `<button class="btn btn-p" style="padding:8px 15px;font-size:13px" onclick="toggleStoreMenu(event)">Add store</button>`}
+        ${S.storeMenu?`<div class="storemenu">${STORES.map(s=>`<button onclick="pickStore('${s.label}')"><span class="em">${s.em}</span>${s.label}</button>`).join('')}</div>`:''}
+      </div></div>
+  </div>`;
+}
+
+/* ═══════════════ TEST SCREEN ═══════════════ */
+function testScreen(){
+  return `<div class="test-frame">
+    <div class="tp-left">
+      <div class="tp-tabs">
+        <button class="tp-tab ${S.tab==='profile'?'on':''}" onclick="setTab('profile')">Agent profile</button>
+        <button class="tp-tab ${S.tab==='chat'?'on':''}" onclick="setTab('chat')">Prompt Generator</button>
+      </div>
+      <div class="tp-body">${S.tab==='profile'?profileView():promptView()}</div>
+      <div class="tp-cta">
+        <div class="cta-info">
+          <span class="roundpill">Round ${S.round}/3</span>
+          <span class="mini">${S.round<3?'Happy with the replies? Continue — or refine.':'Final round — refine here or continue.'}</span>
+        </div>
+        <div class="cta-btns">
+          ${S.round<3
+            ? `<button class="btn btn-s" style="padding:8px 13px" onclick="nextRound()">Refine · round ${S.round+1}</button>
+               <button class="btn btn-p" style="padding:8px 15px" onclick="satisfy()">Yes, looks good ${I.arrowR}</button>`
+            : `<button class="btn btn-s" style="padding:8px 13px" onclick="notSatisfied()">Not right — continue</button>
+               <button class="btn btn-p" style="padding:8px 15px" onclick="satisfy()">Yes, looks good ${I.arrowR}</button>`
+          }
+        </div>
+      </div>
+    </div>
+    ${chatPanel()}
+  </div>`;
+}
+
+function profileView(){
+  return `<div class="avatar">${I.botW}<div class="edit">${I.pencilB}</div></div>
+  <div class="profhead">Agent Profile</div>
+  <div class="profsub">Manage what this agent can do for your business</div>
+  <div class="field"><div class="flabel">Agent name <span class="req">*</span></div><input class="inp" value="${esc(S.agentName)}" oninput="S.agentName=this.value;syncPrompt()"/></div>
+  <div class="field"><div class="flabel">Greeting message <span class="req">*</span></div><input class="inp" value="${esc(S.greeting)}" oninput="S.greeting=this.value"/></div>
+  <div class="field"><div class="flabel">Agent tone <span class="req">*</span></div>
+    <select class="inp" onchange="set('tone',this.value);syncPrompt()">${TONES.map(t=>`<option ${S.tone===t.id?'selected':''}>${t.id}</option>`).join('')}</select></div>
+  <div class="field"><div class="flabel">Website URL</div><input class="inp" value="${esc(S.website)}" oninput="S.website=this.value"/></div>
+  <div class="field"><div class="flabel">Industry <span class="req">*</span></div><input class="inp" value="${industryLabel()}" disabled style="background:#F9FAFB"/></div>
+  <div class="field"><div class="flabel">Sub industry <span class="req">*</span></div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">${subLabels().map(s=>`<span class="qchip" style="cursor:default">${s}</span>`).join('')}</div></div>`;
+}
+
+/* ── Prompt Generator: choices fill the gaps ── */
+function promptView(){
+  const V=x=>`<span class="v">${esc(x)}</span>`;
+  const goal=S.mode==='human'?'assist your human team with suggested replies and context'
+    :S.mode==='ai'?'resolve every customer conversation autonomously'
+    :'resolve routine conversations autonomously and hand complex cases to a human';
+  const capsBlock=capLabels().map(c=>`  - ${c}`).join('\n')+(S.addCaps.trim()?`\n  - ${S.addCaps.trim()}`:'');
+  const sitBlock=situationLabels().map(s=>`  - ${s}`).join('\n');
+  const learned=S.corrections.length
+    ? S.corrections.map(c=>`  - When the customer says something like "${esc(c.trigger)}",\n    respond: "${esc(c.corrected)}"`).join('\n')
+    : '  (none yet — correct a reply in the test panel to add one)';
+
+  const prompt =
+`<span class="h"># ROLE & GOAL</span>
+You are "${V(S.agentName)}", a ${V(S.tone.toLowerCase())} AI support agent for
+${V(S.website)} — a ${V(industryLabel())} business
+specializing in ${V(subLabels().join(', ')||'general products')}.
+Your job is to ${goal}.
+
+<span class="h"># GREETING</span>
+Open every new conversation with:
+"${V(S.greeting)}"
+
+<span class="h"># CAPABILITIES</span>  (tasks you handle)
+${S.caps.length?capLabels().map(c=>`  - ${c}`).join('\n').replace(/  - (.+)/g,(m,t)=>`  - <span class="v">${esc(t)}</span>`):'  (none selected)'}${S.addCaps.trim()?`\n  - <span class="v">${esc(S.addCaps.trim())}</span>`:''}
+
+<span class="h"># TONE</span>
+Speak in a ${V(S.tone)} voice — ${V(toneDesc())}.
+
+<span class="h"># HUMAN HANDOVER</span>
+Human availability: ${V(S.handoverWhen)}.
+Escalate to a human agent when:
+${sitBlock?situationLabels().map(s=>`  - <span class="v">${esc(s)}</span>`).join('\n'):'  (no triggers selected)'}
+Team on call: ${V(S.team.map(t=>t.name+' ('+t.role+')').join(', ')||'none added')}.
+
+<span class="h"># KNOWLEDGE SOURCES</span>
+  - Documents: ${V(S.docs.map(d=>d.name).join(', ')||'none')}
+  - Store: ${V(S.store||'not connected')}
+
+<span class="learned"># LEARNED FROM TESTING</span>  (your corrections)
+${S.corrections.length?S.corrections.map(c=>`  - When the customer says something like "<span class="learned">${esc(c.trigger)}</span>",\n    respond: "<span class="learned">${esc(c.corrected)}</span>"`).join('\n'):'  (none yet — correct a reply in the test panel to add one)'}`;
+
+  return `<div class="gp-legend">
+      <span><i style="background:#FDE68A"></i> filled from your choices</span>
+      <span><i style="background:#86EFAC"></i> learned from your corrections</span>
+    </div>
+    <div class="gp">${prompt}</div>
+    <div class="gp-note">${I.info}<span>This is the system instruction the <b>Prompt Generator</b> builds from your onboarding answers. Every highlighted value is a gap filled by a choice you made — edit a field on the left or correct a reply on the right and it updates here live.</span></div>`;
+}
+
+/* ── Chat panel (interactive) ── */
+function chatPanel(){
+  const rows=S.chat.map((m,idx)=>{
+    if(m.type==='stamp') return `<div class="tstamp">${m.text}</div>`;
+    if(m.type==='user') return `<div class="msg-user-w"><div class="msg-user">${esc(m.text)}</div></div>`;
+    // ai
+    const editing = S.editingMsg===idx;
+    return `<div class="msg-row">
+      <div class="tstamp">${S.agentName} · ${m.time}</div>
+      <div class="msg-ai ${editing?'hi':''}">${esc(m.text)}</div>
+      ${S.showLog&&m.log?`<div class="logline">▸ ${esc(m.log)}</div>`:''}
+      ${m.applied?`<div class="applied">${I.ok} Agent updated — future replies will use your correction</div>`:''}
+      ${!editing&&!m.applied?`<button class="correct-link" onclick="openCorrect(${idx})">${I.pencil} Correct this response</button>`:''}
+      ${editing?`<div class="cbox">
+        <div class="cbox-t">${I.pencil} Correct this response</div>
+        <textarea id="corrTA">${esc(m.text)}</textarea>
+        <div class="cbox-btns">
+          <button class="btn btn-p" onclick="applyCorrect(${idx})">Update</button>
+          <button class="btn btn-s" onclick="cancelCorrect()">Cancel</button>
+        </div></div>`:''}
+    </div>`;
+  }).join('');
+
+  const quicks=['I want to buy a white shirt','Where is my order?','What is your return policy?','I want to talk to a human'];
+
+  return `<div class="chat">
+    <div class="chat-head">
+      <div class="who"><span class="cav">${I.bot}</span>${esc(S.agentName)||'Agent name'}</div>
+      <div class="chat-actions">
+        <button onclick="clearChat()">${I.clear} Clear chat</button>
+        <button onclick="toggleLog()" style="${S.showLog?'color:var(--blue)':''}">${I.log} ${S.showLog?'Hide log':'Show log'}</button>
+      </div>
+    </div>
+    <div class="chat-body" id="chatBody">${rows}</div>
+    <div class="qchips">${quicks.map(q=>`<button class="qchip" onclick="quick('${q.replace(/'/g,"\\'")}')">${q}</button>`).join('')}</div>
+    <div class="chat-in">
+      <span class="paper">${I.paper}</span>
+      <input id="chatInput" placeholder="Write your message.." onkeydown="if(event.key==='Enter')sendChat()"/>
+      <span class="emoji">${I.emoji}</span>
+      <span class="mic">${I.mic}</span>
+      <button class="sendbtn" onclick="sendChat()">${I.send}</button>
+    </div>
+    <div class="poweredby">Powered by REVE Chat 💬</div>
+  </div>`;
+}
+
+/* ═══════════════ RESPONSE ENGINE ═══════════════ */
+function toneWrap(core, warm, prof){
+  if(S.tone==='Friendly') return warm||('😊 '+core);
+  if(S.tone==='Casual') return core;
+  if(S.tone==='Empathetic') return 'I completely understand. '+core;
+  return prof||core; // Professional
+}
+function norm(s){return (s||'').toLowerCase().replace(/[^\w\s]/g,'').replace(/\s+/g,' ').trim();}
+function agentReply(text){
+  const t=text.toLowerCase();
+  const msg=norm(text);
+  // 1) learned corrections win — exact, substring, or strong token overlap
+  for(const c of S.corrections){
+    const trig=norm(c.trigger); if(!trig) continue;
+    let match = (msg===trig) || (trig.length>=3 && (msg.includes(trig)||trig.includes(msg)));
+    if(!match){
+      const tw=trig.split(' '), mw=new Set(msg.split(' '));
+      const hit=tw.filter(w=>mw.has(w)).length;
+      match = tw.length>0 && hit/tw.length>=0.6;
+    }
+    if(match) return {text:c.corrected, log:'matched a learned correction'};
+  }
+  const has=l=>capLabels().includes(l);
+  // 2) product / buy
+  if(/\b(buy|shirt|dress|shoe|product|looking for|want to|recommend|suggestion|which|show me)\b/.test(t)){
+    if(has('Product recommendations'))
+      return {text:'Sure! Kindly share your budget so I can suggest the best options.', log:'capability: Product recommendations'};
+    return {text:"I can share our product range — could you tell me what you're after?", log:'no reco capability; generic product reply'};
+  }
+  // 3) order tracking
+  if(/\b(order|track|where.*(order|parcel|package)|delivery status|shipped)\b/.test(t)){
+    if(has('Order tracking')) return {text:'I can help track your order. Please share your order number.', log:'capability: Order tracking'};
+    return {text:'For order status, let me connect you with our team.', log:'no tracking capability → soft handover'};
+  }
+  // 4) returns
+  if(/\b(return|refund|exchange|money back)\b/.test(t)){
+    if(has('Returns & refunds')||S.docs.some(d=>/return|refund/i.test(d.name)))
+      return {text:'Our return window is 7 days from delivery for unused items. Want me to start a return?', log:'answered from Return & refund policy.pdf'};
+    return {text:'Let me check our return policy for you.', log:'no returns capability/doc'};
+  }
+  // 5) shipping
+  if(/\b(ship|shipping|deliver|how long|when.*arrive|courier)\b/.test(t)){
+    if(has('Shipping queries')) return {text:'We deliver within 3–5 business days nationwide, with free shipping over ৳2,000.', log:'capability: Shipping queries'};
+  }
+  // 6) explicit human
+  if(/\b(human|agent|person|representative|talk to someone|manager)\b/.test(t)){
+    const on=situationLabels().includes('Customer explicitly asks for a human');
+    return {text: on?`Of course — connecting you with ${S.team[0]?.name||'our team'} now. Please hold on.`:'I can help with that directly — could you share a few details?',
+            log: on?'handover trigger: explicit request':'handover trigger not enabled'};
+  }
+  // 7) greeting-ish
+  if(/\b(hi|hello|hey|salam|assalam)\b/.test(t)) return {text:S.greeting, log:'configured greeting'};
+  // fallback
+  return {text: toneWrap("Could you tell me a little more so I can help?", "Happy to help! 😊 Could you tell me a bit more?", "Certainly. Could you provide a little more detail so I can assist?"),
+          log:'fallback response'};
+}
+
+/* ═══════════════ CHAT ACTIONS ═══════════════ */
+function nowTime(){const d=new Date();let h=d.getHours(),m=d.getMinutes();const ap=h>=12?'pm':'am';h=h%12||12;return `${h}:${(m<10?'0':'')+m} ${ap}`;}
+function initChat(){
+  S.chat=[
+    {type:'stamp',text:`${S.agentName} · ${nowTime()}`},
+    {type:'ai',text:S.greeting,time:nowTime(),log:'configured greeting'},
+  ];
+}
+function sendChat(){
+  const el=document.getElementById('chatInput'); if(!el)return;
+  const v=el.value.trim(); if(!v)return; el.value='';
+  S.chat.push({type:'user',text:v,time:nowTime()});
+  const r=agentReply(v);
+  S.chat.push({type:'ai',text:r.text,time:nowTime(),log:r.log});
+  render();
+}
+function quick(q){const el=document.getElementById('chatInput'); if(el){el.value=q; sendChat();}}
+function clearChat(){initChat(); render();}
+function toggleLog(){S.showLog=!S.showLog; render();}
+function openCorrect(i){S.editingMsg=i; render(); setTimeout(()=>{const ta=document.getElementById('corrTA'); if(ta){ta.focus();ta.selectionStart=ta.value.length;}},30);}
+function cancelCorrect(){S.editingMsg=null; render();}
+function applyCorrect(i){
+  const ta=document.getElementById('corrTA'); if(!ta)return;
+  const corrected=ta.value.trim(); if(!corrected){cancelCorrect();return;}
+  // find the user message that triggered this ai reply
+  let trigger=''; for(let k=i-1;k>=0;k--){ if(S.chat[k].type==='user'){trigger=S.chat[k].text;break;} }
+  S.chat[i].text=corrected; S.chat[i].applied=true; S.chat[i].log='learned correction applied';
+  S.editingMsg=null;
+  if(trigger){
+    const existing=S.corrections.find(c=>c.trigger===trigger);
+    if(existing) existing.corrected=corrected; else S.corrections.push({trigger,corrected});
+  } else {
+    // corrected the opening greeting (no preceding user turn) → update greeting itself
+    S.greeting=corrected;
+  }
+  render();
+}
+
+/* ═══════════════ WIZARD ACTIONS ═══════════════ */
+function set(k,v){S[k]=v; render();}
+function toggle(k,i){const a=S[k]; S[k]=a.includes(i)?a.filter(x=>x!==i):[...a,i]; render();}
+function setIndustry(id){S.industry=id; if(id!=='ecom')S.subs=[]; else if(!S.subs.length)S.subs=[0]; render();}
+/* returns array of field ids that are missing on the current step, [] if valid */
+function stepErrors(){
+  if(S.step===1){
+    const e=[];
+    if(!S.industry) e.push('f-industry');
+    if(S.industry==='ecom' && S.subs.length===0) e.push('f-subs');
+    return e;
+  }
+  if(S.step===2){
+    const e=[];
+    if(!S.agentName.trim()) e.push('f-agentName');
+    if(!S.greeting.trim()) e.push('f-greeting');
+    if(S.caps.length===0) e.push('f-caps');
+    return e;
+  }
+  if(S.step===3){
+    return S.situations.length===0 ? ['f-situations'] : [];
+  }
+  return [];
+}
+function flashErrors(ids){
+  ids.forEach(id=>{
+    const el=document.getElementById(id); if(!el) return;
+    el.classList.remove('err-flash'); void el.offsetWidth; el.classList.add('err-flash');
+  });
+  const first=document.getElementById(ids[0]);
+  if(first) first.scrollIntoView({behavior:'smooth',block:'center'});
+  toast('Please complete the highlighted field'+(ids.length>1?'s':'')+' before continuing.');
+}
+function next(){
+  const errs=stepErrors();
+  if(errs.length){ flashErrors(errs); return; }
+  if(S.step<STEPS.length-1){S.step++; render();}
+}
+function prev(){ if(S.step>0){S.step--; render();} }
+function addDoc(){S.docs.push({name:`Document ${S.docs.length+1}.pdf`}); render();}
+function removeDoc(i){S.docs.splice(i,1); render();}
+function toggleStoreMenu(e){e.stopPropagation(); S.storeMenu=!S.storeMenu; render();}
+function pickStore(name){S.store=name; S.storeMenu=false; render();}
+function addTeam(){
+  const n=document.getElementById('tn'),e=document.getElementById('te'),r=document.getElementById('tr');
+  if(n&&n.value.trim()){S.team.push({name:n.value.trim(),email:(e?.value||'').trim(),role:r?.value||'Agent'});}
+  else {S.team.push({name:'',email:'',role:'Agent'});}
+  render();
+}
+function removeTeam(i){S.team.splice(i,1); render();}
+function finish(){S.screen='generating'; render(); setTimeout(()=>{S.screen='test'; S.tab='chat'; S.round=1; S.satisfied=null; initChat(); render();}, 1700);}
+function setTab(t){S.tab=t; render();}
+function syncPrompt(){ if(S.tab==='chat'){const b=document.querySelector('.tp-body'); if(b)b.innerHTML=promptView();} }
+
+function nextRound(){
+  if(S.round<3){S.round++;
+    S.chat.push({type:'stamp',text:`— Round ${S.round} · retesting with your updates —`});
+    render();
+  }
+}
+function satisfy(){S.satisfied=true; S.screen='summary'; render();}
+function notSatisfied(){S.satisfied=false; S.screen='summary'; render();}
+function toBuilder(){S.screen='builder'; render();}
+function backToTest(){S.screen='test'; render();}
+function deployAgent(){toast('🎉 Agent deployed — live on your website widget with '+S.corrections.length+' learned correction(s).');}
+
+document.addEventListener('click',()=>{ if(S.storeMenu){S.storeMenu=false; render();} });
+render();
+</script>
+</body>
+</html>
